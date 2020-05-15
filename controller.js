@@ -18,6 +18,18 @@ module.exports = http.createServer((req, res) => {
         reqUrl.pathname);
         service.getUIRequest(req, res); 
     } 
+    else if(reqUrl.pathname == '/download' && req.method === 'PUT') {
+        console.log('Request Type:' +
+        req.method + ' Endpoint: ' +
+        reqUrl.pathname);
+        service.setDownloadRequest(req, res); 
+    } 
+    else if(reqUrl.pathname == '/get-download-progress' && req.method === 'GET') {
+        console.log('Request Type:' +
+        req.method + ' Endpoint: ' +
+        reqUrl.pathname);
+        service.getDownloadProgress(req, res);
+    } 
     else {
         console.log('Request Type:' +
             req.method + ' Invalid Endpoint: ' +
