@@ -12,6 +12,9 @@ const configPath = "../config"
 
 var registerPaths = {};
 
+var downloadProc;
+var LinkerObject;
+
 var CommandObject;
 var progress = JSON.parse('{"name": "", "progress": 0, "status": ""}');
 // UIrawdata = fs.readFileSync('UI.json');
@@ -77,6 +80,11 @@ function mapLinkNamesToFilepaths () {
     console.log(registerPaths);
 }
 
+function loadLinker() {
+    LinkerObject = getJsonFromFile(configPath + '/Linker.json');
+    mapLinkNamesToFilepaths();
+}
+
 const getJsonFromFile = function (filepath) {
     fs.open;
     // console.log(configPath + '/UI.json')
@@ -93,8 +101,43 @@ const getJsonFromFile = function (filepath) {
     return JSON.parse(objFromFile);
 }
 
-var LinkerObject = getJsonFromFile(configPath + '/Linker.json');
-mapLinkNamesToFilepaths();
+function downloadInstallOverlay (s3dir) {
+    return new Promise((resolve, reject) => {
+
+        let errors = [];
+
+        // any unix based command
+        var cmdToLaunch = "./" + downloadScriptPath + "/aws_overlay_installer.py -p json -b nih-demos -d " + CommandObject.downloadurl;
+        console.log(cmdToLaunch)
+
+        const { spawn } = require("child_process");
+        let downloadProc = spawn(cmdToLaunch);
+
+        downloadProc.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+        });
+
+        downloadProc.stderr.on('data', (data) => {
+            console.log(`stderr: ${data}`);
+            errors.push(data)
+        });
+
+        downloadProc.on('close', (code) => {
+            console.log(`exit code: ${code}`);
+            if (errors) {
+                reject({code, errors});
+            }
+            else {
+                loadLinker();
+                resolve({code});
+            }
+        });
+
+
+
+    });
+}
+loadLinker();
 
 const execCB = function (error, stdout, stderr) {
     if (error) {
@@ -214,39 +257,14 @@ exports.setDownloadRequest = function (req, res) {
             postBody = JSON.parse(body);
             CommandObject = postBody;
 
-            // any unix based command
-            var cmdToLaunch = "./" + downloadScriptPath + "/awsdownload.py -b nih-demos -d " + CommandObject.downloadurl;
-            console.log(cmdToLaunch)
-
-            // const { spawn } = require("child_process");
-            var exec = require('child_process').exec;
-            exec(cmdToLaunch, progressCB)
-
-            // for await (const data of child.stdout) {
-            //     progress = JSON.parse(data)
-            // }
-
-            // for await (const data of child.close) {
-            //     console.log("python is done")
-            // }
-
-            var projectName = CommandObject.projectname.replace('-', '_')
-
-            var cmdToLaunch = "./" + downloadScriptPath + "/overlaymgr load " + projectName
-            exec(cmdToLaunch, execCB)
-
-            var cmdToLaunch = "./" + downloadScriptPath + "/drivermgr load " + projectName
-            exec(cmdToLaunch, execCB)
-
-            LinkerObject = getJsonFromFile(configPath + '/Linker.json')
-
-
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(CommandObject));
+            
 
         }
         catch (error) {
+            console.error(error);
             //Do Nothing ;)
         }
     });
@@ -257,6 +275,7 @@ exports.getDownloadProgress = function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(progress));
 };
+
 
 // cmd.on("close", code => {
 //     console.log(`program done with exit code ${code}`);
