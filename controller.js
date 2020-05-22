@@ -30,6 +30,12 @@ module.exports = http.createServer((req, res) => {
         reqUrl.pathname);
         service.getDownloadProgress(req, res);
     } 
+    else if(reqUrl.pathname == '/set-download-progress' && req.method == 'PUT') {
+        console.log('Request Type:' +
+        req.method + ' Endpoint: ' +
+        reqUrl.pathname);
+        service.setDownloadProgress(req, res);
+    }
     else {
         console.log('Request Type:' +
             req.method + ' Invalid Endpoint: ' +

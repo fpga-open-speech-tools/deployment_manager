@@ -9,14 +9,16 @@ const fe = "/fe_";
 const downloadScriptPath = "../utils"
 const configPath = "../config"
 
+var previousProjectName; 
 
 var registerPaths = {};
 
 var downloadProc;
 var LinkerObject;
 
+
 var CommandObject;
-var progress = JSON.parse('{"name": "", "progress": 0, "status": ""}');
+var progress = '{"progress": 0, "status": ""}';
 // UIrawdata = fs.readFileSync('UI.json');
 // UIObject = JSON.parse(UIrawdata);
 
@@ -27,7 +29,7 @@ exports.Init = function () {
 
 
 function createDevicePath (moduleName, majorNumber) {
-    console.log("hi");
+    // console.log("hi");
     // var targetDriver = LinkerObject[cmdObj.module];
     // //var targetName = cmdObj.module.ToString();
     // var links = targetDriver['links'];
@@ -36,19 +38,19 @@ function createDevicePath (moduleName, majorNumber) {
     const filepath = deviceLocation
         + fe + moduleName.trim() + '_' + majorNumber
         + fe + moduleName.trim() + '_' + majorNumber;
-    console.log('Command Prepared.' + filepath);
+    // console.log('Command Prepared.' + filepath);
     return filepath;
 }
 
 function findMajorNumber (moduleName) {
     // TODO: error handling; if module is not installed, the grep | cut command will return an empty string. We need to make sure that the returned major number is indeed an integer
-    console.log('hello');
+    // console.log('hello');
     const { execSync } = require('child_process');
     const cmd = 'ls /sys/class | grep -P "fe_' + moduleName + '_\\d+" | cut -d _ -f 3';
-    console.log(cmd);
+    // console.log(cmd);
     const majorNumber = execSync(cmd);
-    console.log(majorNumber)
-    console.log(majorNumber.toString().trim());
+    // console.log(majorNumber)
+    // console.log(majorNumber.toString().trim());
     return majorNumber.toString().trim();
 }
 
@@ -107,25 +109,37 @@ function downloadInstallOverlay (s3dir) {
         let errors = [];
 
         // any unix based command
-        var cmdToLaunch = "./" + downloadScriptPath + "/aws_overlay_installer.py -p json -b nih-demos -d " + CommandObject.downloadurl;
-        console.log(cmdToLaunch)
+        // var cmdToLaunch = downloadScriptPath + "/aws_overlay_installer.py -p json -b nih-demos -d " + CommandObject.downloadurl;
+        // console.log(cmdToLaunch)
 
         const { spawn } = require("child_process");
-        let downloadProc = spawn(cmdToLaunch);
+        let downloadProc = spawn('python3', [downloadScriptPath + '/aws_overlay_installer.py', '-e', 'http://127.0.0.1:3355/set-download-progress', '-b', 'nih-demos', '-d', s3dir]);
 
         downloadProc.stdout.on('data', (data) => {
             console.log(`stdout: ${data}`);
+            if (data.toString().charAt(0) === '{') {
+                // progress = JSON.parse(data);
+                // console.log(data.toString());
+           }
         });
 
         downloadProc.stderr.on('data', (data) => {
-            console.log(`stderr: ${data}`);
+            // console.log(`stderr: ${data}`);
             errors.push(data)
         });
 
+        // TODO: errors on stderr right now aren't actually problematic; 
+        //       improve this error handling
         downloadProc.on('close', (code) => {
             console.log(`exit code: ${code}`);
             if (errors) {
-                reject({code, errors});
+                console.log(errors.toString());
+                // reject({code, errors});
+                if (code == 0) {
+                    console.log('code is 0');
+                    loadLinker();
+                    resolve({code});
+                }
             }
             else {
                 loadLinker();
@@ -137,6 +151,16 @@ function downloadInstallOverlay (s3dir) {
 
     });
 }
+
+function removePreviousOverlay () {
+    const { exec } = require('child_process')
+
+    let cmd = './' + downloadScriptPath + '/overlaymgr remove ' + previousProjectName;
+    exec(cmd, execCB);
+    cmd = './' + downloadScriptPath + '/drivermgr remove ' + previousProjectName;
+    exec(cmd, execCB);
+}
+
 loadLinker();
 
 const execCB = function (error, stdout, stderr) {
@@ -162,24 +186,24 @@ const progressCB = function (error, stdout, stderr) {
 }
 
 exports.setCommandRequest = function (req, res) {
-    console.log('New Command Received.');
+    // console.log('New Command Received.');
     let body = [];
 
-    console.log('New Command Received.');
+    // console.log('New Command Received.');
     req.on('data', function (chunk) {
         body.push(chunk);
     });
 
-    console.log('New Command Received.');
+    // console.log('New Command Received.');
     req.on('end', function () {
 
-    console.log('New Command Received.');
+    // console.log('New Command Received.');
         try {
-            console.log('asdf');
+            // console.log('asdf');
             postBody = JSON.parse(body);
-            console.log('asdf');
+            // console.log('asdf');
             CommandObject = postBody;
-            console.log('asdf');
+            // console.log('asdf');
             
 
             // console.log(CommandObject)
@@ -190,7 +214,7 @@ exports.setCommandRequest = function (req, res) {
             // console.log(echoFile);
             //console.log('\nExpected echo path: ', echoFile)
 
-            console.log('asdfasdf');
+            // console.log('asdfasdf');
             console.log(registerPaths);
 
             echoFile = registerPaths[CommandObject.module][CommandObject.link];
@@ -245,7 +269,7 @@ exports.invalidRequest = function (req, res) {
 
 exports.setDownloadRequest = function (req, res) {
     //console.log('New Command Received.');
-    body = '';
+    let body = '';
 
     req.on('data', function (chunk) {
         body += chunk;
@@ -257,9 +281,29 @@ exports.setDownloadRequest = function (req, res) {
             postBody = JSON.parse(body);
             CommandObject = postBody;
 
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(CommandObject));
+            // previous overlay needs to be removed before loading in a new one
+            if (previousProjectName) {
+                removePreviousOverlay();
+            }
+
+            // reset progress back to 0 before downloading
+            progress = '{"progress": 0, "status": ""}';
+
+            var downloadPromise = downloadInstallOverlay(CommandObject.downloadurl);
+
+            downloadPromise.then((result) => {
+                console.log("success");
+
+                previousProjectName = CommandObject.projectname.replace('-', '_');
+
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify(CommandObject));
+            }, (result) => {
+                console.log("failure");
+                // TODO: send back something else one failure
+            });
+
             
 
         }
@@ -273,10 +317,22 @@ exports.setDownloadRequest = function (req, res) {
 exports.getDownloadProgress = function (req, res) {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(progress));
+    res.end(progress);
 };
 
+exports.setDownloadProgress = function (req, res) {
+    let body = '';
 
-// cmd.on("close", code => {
-//     console.log(`program done with exit code ${code}`);
-// });
+    req.on('data', function (chunk) {
+        body += chunk;
+    });
+
+    req.on('end', () => {
+        progress = body;
+        // console.log(progress);
+
+        res.statusCode = 200;
+        // res.setHeader('Content-Type', 'application/json');
+        res.end();
+    });
+}
