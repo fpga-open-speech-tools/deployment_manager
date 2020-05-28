@@ -24,7 +24,7 @@ function createDevicePath (moduleName, majorNumber) {
 function findMajorNumber (moduleName) {
     // TODO: error handling; if module is not installed, the grep | cut command will return an empty string. We need to make sure that the returned major number is indeed an integer
     const { execSync } = require('child_process');
-    const cmd = 'ls /sys/class | grep -P "fe_' + moduleName + '_\\d+" | cut -d _ -f 3';
+    const cmd = `ls /sys/class${fe}${moduleName}_*  | grep -o '[^_]*$'`;
     const majorNumber = execSync(cmd);
     // console.log(majorNumber.toString().trim());
     return majorNumber.toString().trim();
