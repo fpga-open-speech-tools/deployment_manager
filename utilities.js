@@ -24,10 +24,17 @@ function createDevicePath (moduleName, majorNumber) {
 function findMajorNumber (moduleName) {
     // TODO: error handling; if module is not installed, the grep | cut command will return an empty string. We need to make sure that the returned major number is indeed an integer
     const { execSync } = require('child_process');
-    const cmd = `ls /sys/class${fe}${moduleName}_*  | grep -o '[^_]*$'`;
-    const majorNumber = execSync(cmd);
-    // console.log(majorNumber.toString().trim());
-    return majorNumber.toString().trim();
+
+    try {
+        const cmd = `ls /sys/class${fe}${moduleName}_*  | grep -o '[^_]*$'`;
+        const majorNumber = execSync(cmd);
+        // console.log(majorNumber.toString().trim());
+        return majorNumber.toString().trim();
+    } catch (error) {
+        // the most likely error to occur is that the desired directory doesn't 
+        // exist because the driver hasn't been loaded yet; this is no big deal
+        console.log(error.toString());
+    }
 }
 
 const mapLinkNamesToFilepaths = function(LinkerObject) {
@@ -42,6 +49,7 @@ const mapLinkNamesToFilepaths = function(LinkerObject) {
 
             registerPaths[device] = {};
 
+            // TODO: registerPaths probably shouldn't be populated if the driver isn't loaded. When a driver isn't loaded, we should tell the user about it.
             const majorNumber = findMajorNumber(device);
             const devicePath = createDevicePath(device, majorNumber);
 
