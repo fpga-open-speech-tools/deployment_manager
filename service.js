@@ -2,6 +2,7 @@
 
 const url = require('url');
 const util = require('./utilities.js');
+const fs = require('fs');
 
 const configPath = "../config"
 
@@ -36,12 +37,7 @@ exports.setCommandRequest = function (req, res) {
             // console.log(registerPaths);
             echoFile = registerPaths[CommandObject.module][CommandObject.link];
 
-            var exec = require('child_process').exec;
-
-            var cmdToLaunch = "echo " + CommandObject.value + " > " + echoFile;
-            console.log('Command: ', cmdToLaunch);
-
-            exec(cmdToLaunch, util.execCB);
+            fs.writeFileSync(echoFile, CommandObject.value);
 
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
