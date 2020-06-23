@@ -37,7 +37,14 @@ module.exports = http.createServer((req, res) => {
         console.log('Request Type:' + req.method +
             ' Endpoint: ' + reqUrl.pathname);
         
-        service.saveConfiguration(req, res);
+        service.getRegisterConfig(req, res);
+    }
+    else if(reqUrl.pathname == '/set-register-config' && req.method == 'PUT')
+    {
+        console.log('Request Type:' + req.method +
+            ' Endpoint: ' + reqUrl.pathname);
+        
+        service.setRegisterConfig(req, res);
     }
     else {
         console.log('Request Type:' + req.method +

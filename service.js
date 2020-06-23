@@ -51,7 +51,7 @@ exports.setCommandRequest = function (req, res) {
     });
 };
 
-exports.saveConfiguration = function (req, res) {
+exports.getRegisterConfig = function (req, res) {
     let registers = {"registers": []};
 
     for (const module in registerPaths) {
@@ -78,6 +78,57 @@ exports.saveConfiguration = function (req, res) {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(registers));
+}
+
+exports.setRegisterConfig = function (req, res) {
+    let body = [];
+    console.log('in setRegisterConfig');
+
+    req.on('data', function (chunk) {
+        body.push(chunk);
+    });
+
+    req.on('end', function () {
+        console.log(body);
+
+        try {
+            registerConfig = JSON.parse(body);
+            console.log(registerConfig);
+
+            let UIObject = util.getJsonFromFile(configPath + '/UI.json');
+
+            // write all of the registers
+            registerConfig['registers'].forEach(register => {
+                registerPath = registerPaths[register.module][register.link];
+                fs.writeFileSync(registerPath, register.value);        
+                // TODO: perform readback so we know that the write worked properly?
+            }); 
+
+            // update the register values in the UI config
+            UIObject['pages'].forEach(page => {
+               page['panels'].forEach(panel => {
+                   panel['controls'].forEach(control => {
+                       registerConfig['registers'].forEach(register => {
+                            if (register.module == control.module && 
+                                register.link == control.linkerName) {
+                                    control.defaultValue = register.value;
+                                    console.log(`set register value ${register.value} for control ${control.linkerName}`);
+                                }
+                       });
+                   });
+               }); 
+            });
+
+            res.status = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(UIObject));
+        }
+        catch(error) {
+            res.status = 500
+            // TODO: error handling and correct return code?
+            console.error(error);
+        }
+   });
 }
 
 exports.getUIRequest = function (req, res) {
