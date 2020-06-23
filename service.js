@@ -51,7 +51,34 @@ exports.setCommandRequest = function (req, res) {
     });
 };
 
+exports.saveConfiguration = function (req, res) {
+    let registers = {"registers": []};
 
+    for (const module in registerPaths) {
+        // console.log(module);
+        // console.log(registerPaths[module]);
+
+        for (const link in registerPaths[module]) {
+            // console.log(link);
+
+            // const value = util.readRegister(module, link)
+            registerPath = registerPaths[module][link];
+            const value = fs.readFileSync(registerPath, 'utf8').trim();
+
+            registerConfiguration = {
+                "module": module, "link": link, "value": value
+            };
+
+            // console.log(registerConfiguration);
+
+            registers["registers"].push(registerConfiguration);
+        }
+    }
+
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(registers));
+}
 
 exports.getUIRequest = function (req, res) {
     const reqUrl = url.parse(req.url, true);

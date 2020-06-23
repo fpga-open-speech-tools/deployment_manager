@@ -5,41 +5,43 @@ module.exports = http.createServer((req, res) => {
 
     const service = require('./service.js');
     const reqUrl = url.parse(req.url, true);
+
     if (reqUrl.pathname == '/sendCmd' && req.method === 'PUT') {
-        console.log('Request Type:' +
-            req.method + ' Endpoint: ' +
-            reqUrl.pathname);
+        console.log('Request Type:' + req.method +
+            ' Endpoint: ' + reqUrl.pathname);
 
         service.setCommandRequest(req, res);
     }
     else if(reqUrl.pathname == '/ui' && req.method === 'GET') {
-        console.log('Request Type:' +
-        req.method + ' Endpoint: ' +
-        reqUrl.pathname);
+        console.log('Request Type:' + req.method +
+            ' Endpoint: ' + reqUrl.pathname);
         service.getUIRequest(req, res); 
     } 
     else if(reqUrl.pathname == '/download' && req.method === 'PUT') {
-        console.log('Request Type:' +
-        req.method + ' Endpoint: ' +
-        reqUrl.pathname);
+        console.log('Request Type:' + req.method +
+            ' Endpoint: ' + reqUrl.pathname);
         service.setDownloadRequest(req, res); 
     } 
     else if(reqUrl.pathname == '/get-download-progress' && req.method === 'GET') {
-        console.log('Request Type:' +
-        req.method + ' Endpoint: ' +
-        reqUrl.pathname);
+        console.log('Request Type:' + req.method +
+            ' Endpoint: ' + reqUrl.pathname);
         service.getDownloadProgress(req, res);
     } 
     else if(reqUrl.pathname == '/set-download-progress' && req.method == 'PUT') {
-        console.log('Request Type:' +
-        req.method + ' Endpoint: ' +
-        reqUrl.pathname);
+        console.log('Request Type:' + req.method +
+            ' Endpoint: ' + reqUrl.pathname);
         service.setDownloadProgress(req, res);
     }
+    else if(reqUrl.pathname == '/get-register-config' && req.method == 'GET')
+    {
+        console.log('Request Type:' + req.method +
+            ' Endpoint: ' + reqUrl.pathname);
+        
+        service.saveConfiguration(req, res);
+    }
     else {
-        console.log('Request Type:' +
-            req.method + ' Invalid Endpoint: ' +
-            reqUrl.pathname);
+        console.log('Request Type:' + req.method +
+            ' Endpoint: ' + reqUrl.pathname);
 
         service.invalidRequest(req, res);
 
