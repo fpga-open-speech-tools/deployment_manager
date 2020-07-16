@@ -6,17 +6,28 @@ module.exports = http.createServer((req, res) => {
     const service = require('./service.js');
     const reqUrl = url.parse(req.url, true);
 
-    if (reqUrl.pathname == '/sendCmd' && req.method === 'PUT') {
+    if (reqUrl.pathname == '/model-data' && req.method === 'PUT') {
         console.log('Request Type:' + req.method +
             ' Endpoint: ' + reqUrl.pathname);
-
-        service.setCommandRequest(req, res);
+        
+        service.setRegisterConfig(req, res);
     }
-    else if(reqUrl.pathname == '/ui' && req.method === 'GET') {
+    else if (reqUrl.pathname == '/model-data' && req.method === 'GET') {
         console.log('Request Type:' + req.method +
             ' Endpoint: ' + reqUrl.pathname);
-        service.getUIRequest(req, res); 
-    } 
+        
+        service.getRegisterConfig(req, res);
+    }
+    else if (reqUrl.pathname == '/configuration' && req.method === 'PUT') {
+        console.log('Request Type:' + req.method +
+            ' Endpoint: ' + reqUrl.pathname);
+        service.setConfiguration(req, res);
+    }
+    else if (reqUrl.pathname == '/configuration' && req.method === 'GET') {
+        console.log('Request Type:' + req.method +
+            ' Endpoint: ' + reqUrl.pathname);
+        service.getConfiguration(req, res); 
+    }
     else if(reqUrl.pathname == '/download' && req.method === 'PUT') {
         console.log('Request Type:' + req.method +
             ' Endpoint: ' + reqUrl.pathname);
@@ -32,25 +43,10 @@ module.exports = http.createServer((req, res) => {
             ' Endpoint: ' + reqUrl.pathname);
         service.setDownloadProgress(req, res);
     }
-    else if(reqUrl.pathname == '/get-register-config' && req.method == 'GET')
-    {
-        console.log('Request Type:' + req.method +
-            ' Endpoint: ' + reqUrl.pathname);
-        
-        service.getRegisterConfig(req, res);
-    }
-    else if(reqUrl.pathname == '/set-register-config' && req.method == 'PUT')
-    {
-        console.log('Request Type:' + req.method +
-            ' Endpoint: ' + reqUrl.pathname);
-        
-        service.setRegisterConfig(req, res);
-    }
     else {
         console.log('Request Type:' + req.method +
             ' Endpoint: ' + reqUrl.pathname);
 
         service.invalidRequest(req, res);
-
     }
 });

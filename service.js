@@ -3,6 +3,7 @@
 const url = require('url');
 const util = require('./utilities.js');
 const fs = require('fs');
+const config = require('./configuration.js');
 
 const configPath = "../config"
 
@@ -95,7 +96,7 @@ exports.setRegisterConfig = function (req, res) {
             registerConfig = JSON.parse(body);
             console.log(registerConfig);
 
-            let UIObject = util.getJsonFromFile(configPath + '/UI.json');
+            let UIObject = util.loadJsonFile(configPath + '/UI.json');
 
             // write all of the registers
             registerConfig['registers'].forEach(register => {
@@ -138,7 +139,7 @@ exports.getUIRequest = function (req, res) {
         name = reqUrl.query.name
     }
 
-    const UIObject = util.getJsonFromFile(configPath + '/UI.json')
+    const UIObject = util.loadJsonFile(configPath + '/UI.json')
 
     // console.log(JSON.stringify(UIObject));
 
@@ -223,4 +224,34 @@ exports.setDownloadProgress = function (req, res) {
         // res.setHeader('Content-Type', 'application/json');
         res.end();
     });
-}
+};
+
+exports.setConfiguration = function (request, result) {
+    let body = '';
+
+    request.on('data', (chunk) => {
+        body += chunk;
+    });
+
+    request.on('end', () => {
+        try {
+            config.set(body);
+            result.statusCode = 200;
+        } catch (error) {
+            console.error(error);
+        }
+
+        result.end();
+    });
+};
+
+exports.getConfiguration = function (request, result) {
+    try {
+        const configuration = config.get();
+        result.statusCode = 200;
+        result.setHeader('Content-Type', 'application/json');
+        result.end(JSON.stringify(configuration));
+    } catch (error) {
+        console.error(error);
+    }
+};

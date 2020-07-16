@@ -67,17 +67,25 @@ const mapLinkNamesToFilepaths = function(LinkerObject) {
     return registerPaths;
 }
 
-const getJsonFromFile = function (filepath) {
+const loadJsonFile = function (filepath) {
     fs.open;
-    const objFromFile = fs.readFileSync(filepath,
-        { encoding: 'utf-8', flag: 'r' })
+    const objFromFile = fs.readFileSync(filepath, { encoding: 'utf-8', flag: 'r' })
     fs.close;
 
     return JSON.parse(objFromFile);
 }
 
+exports.saveJsonFile = function (filepath, jsonData) {
+    fs.open;
+    fs.writeFile(filepath, JSON.stringify(jsonData), (err) => {
+        if (err) throw err;
+    });
+    fs.close;
+
+}
+
 const loadLinker = function(configPath) {
-    const LinkerObject = getJsonFromFile(configPath + '/Linker.json');
+    const LinkerObject = loadJsonFile(configPath + '/Linker.json');
     const registerPaths = mapLinkNamesToFilepaths(LinkerObject);
     return registerPaths;
 }
@@ -137,6 +145,6 @@ const removePreviousOverlay = function(previousProjectName) {
 
 exports.execCB = execCB;
 exports.loadLinker = loadLinker;
-exports.getJsonFromFile = getJsonFromFile;
+exports.loadJsonFile = loadJsonFile;
 exports.downloadInstallOverlay = downloadInstallOverlay;
 exports.removePreviousOverlay = removePreviousOverlay;
