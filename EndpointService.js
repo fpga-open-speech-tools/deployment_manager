@@ -3,8 +3,9 @@
 const url = require('url');
 const util = require('./utilities.js');
 const fs = require('fs');
-const config = require('./Configuration.js');
+const config = require('./ModelConfiguration.js');
 const registers = require('./Register.js');
+const ModelController = require('./ModelController.js');
 
 const configPath = "../config"
 
@@ -13,11 +14,33 @@ var previousProjectName;
 var registerPaths = {};
 
 var CommandObject;
-var progress = '{"progress": 0, "status": ""}';
 
 exports.Init = function () {
     return;
-}
+};
+
+exports.setModelData = function (request, result) {
+    // ModelController.setData();
+    let body = [];
+
+    request.on('data', (chunk) => {
+        body.push(chunk);
+    });
+
+    request.on('end', () => {
+        try {
+            console.log(body.toString());
+            result.status = 200;
+            result.end();
+        } catch (error) {
+            
+        }
+    });
+};
+
+exports.getModelData = function(request, result) {
+    ModelController.getData();
+};
 
 
 var registerPaths = registers.loadLinker(configPath);
@@ -192,7 +215,8 @@ exports.setConfiguration = function (request, result) {
 
     request.on('end', () => {
         try {
-            config.set(body);
+            const newConfig = JSON.parse(body);
+            config.set(newConfig);
             result.statusCode = 200;
         } catch (error) {
             console.error(error);

@@ -9,7 +9,7 @@ module.exports = http.createServer((request, result) => {
         ' Endpoint: ' + reqUrl.pathname);
 
     if (reqUrl.pathname == '/model-data' && request.method === 'POST') {
-        service.setCommandRequest(request, result);
+        service.setModelData(request, result);
     }
     else if (reqUrl.pathname == '/model-data' && request.method === 'GET') {
         service.getModelData(request, result);

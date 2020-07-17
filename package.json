@@ -1,0 +1,18 @@
+{
+  "name": "control_server",
+  "version": "1.0.0",
+  "description": "Node JS server for driver/ui interface",
+  "main": "EndpointServer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-flatearth:fpga-open-speech-tools/control_server.git"
+  },
+  "author": "Trevor Vannoy, Dustin Sobrero",
+  "license": "MIT",
+  "dependencies": {
+    "deepmerge": "^4.2.2"
+  }
+}
