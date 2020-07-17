@@ -3,7 +3,8 @@
 const url = require('url');
 const util = require('./utilities.js');
 const fs = require('fs');
-const config = require('./configuration.js');
+const config = require('./Configuration.js');
+const registers = require('./Register.js');
 
 const configPath = "../config"
 
@@ -19,7 +20,7 @@ exports.Init = function () {
 }
 
 
-var registerPaths = util.loadLinker(configPath);
+var registerPaths = registers.loadLinker(configPath);
 
 
 exports.setCommandRequest = function (req, res) {
