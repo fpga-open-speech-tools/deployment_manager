@@ -133,28 +133,6 @@ exports.setRegisterConfig = function (req, res) {
    });
 }
 
-exports.getUIRequest = function (req, res) {
-    const reqUrl = url.parse(req.url, true);
-
-    if (reqUrl.query.name) {
-        name = reqUrl.query.name
-    }
-
-    const UIObject = util.loadJsonFile(configPath + '/UI.json')
-
-    // console.log(JSON.stringify(UIObject));
-
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(UIObject));
-};
-
-exports.invalidRequest = function (req, res) {
-    res.statusCode = 404;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Invalid Request');
-};
-
 exports.setDownloadRequest = function (req, res) {
     let body = '';
 
@@ -204,28 +182,6 @@ exports.setDownloadRequest = function (req, res) {
     });
 };
 
-exports.getDownloadProgress = function (req, res) {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(progress);
-};
-
-exports.setDownloadProgress = function (req, res) {
-    let body = '';
-
-    req.on('data', function (chunk) {
-        body += chunk;
-    });
-
-    req.on('end', () => {
-        progress = body;
-        // console.log(progress);
-
-        res.statusCode = 200;
-        // res.setHeader('Content-Type', 'application/json');
-        res.end();
-    });
-};
 
 exports.setConfiguration = function (request, result) {
     let body = '';
@@ -255,4 +211,10 @@ exports.getConfiguration = function (request, result) {
     } catch (error) {
         console.error(error);
     }
+};
+
+exports.invalidRequest = function (req, res) {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('Invalid Request');
 };

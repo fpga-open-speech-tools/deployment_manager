@@ -23,12 +23,6 @@ module.exports = http.createServer((request, result) => {
     else if(reqUrl.pathname == '/download' && request.method === 'PUT') {
         service.setDownloadRequest(request, result); 
     } 
-    else if(reqUrl.pathname == '/get-download-progress' && request.method === 'GET') {
-        service.getDownloadProgress(request, result);
-    } 
-    else if(reqUrl.pathname == '/set-download-progress' && request.method == 'PUT') {
-        service.setDownloadProgress(request, result);
-    }
     else {
         service.invalidRequest(request, result);
     }
