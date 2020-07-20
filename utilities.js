@@ -21,7 +21,9 @@ exports.loadJsonFile = function (filepath) {
 exports.saveJsonFile = function (filepath, jsonData) {
     fs.open;
     fs.writeFile(filepath, JSON.stringify(jsonData), (err) => {
-        if (err) throw err;
+        if (err) {
+            throw err;
+        } 
     });
     fs.close;
 }

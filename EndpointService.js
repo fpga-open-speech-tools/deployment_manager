@@ -3,7 +3,6 @@
 const url = require('url');
 const util = require('./utilities.js');
 const fs = require('fs');
-const config = require('./ModelConfiguration.js');
 const registers = require('./Register.js');
 const ModelController = require('./ModelController.js');
 
@@ -20,7 +19,6 @@ exports.Init = function () {
 };
 
 exports.setModelData = function (request, result) {
-    // ModelController.setData();
     let body = [];
 
     request.on('data', (chunk) => {
@@ -29,9 +27,26 @@ exports.setModelData = function (request, result) {
 
     request.on('end', () => {
         try {
-            console.log(body.toString());
-            result.status = 200;
-            result.end();
+            // const dataPackets = JSON.parse(body);
+            const dataPackets = body;
+            console.log(dataPackets);
+
+            const promise = ModelController.setData(dataPackets);
+            promise.then((fulfilledResult) => {
+                console.log("successfully set model data");
+
+                result.status = 200;
+                result.end();
+
+            }, (rejectedResult) => {
+                // TODO: error handling
+                console.error(rejectedResult);
+
+                // XXX: is this the most appropriate status code?
+                result.status = 400;
+                result.end();
+            });
+
         } catch (error) {
             
         }
@@ -216,7 +231,7 @@ exports.setConfiguration = function (request, result) {
     request.on('end', () => {
         try {
             const newConfig = JSON.parse(body);
-            config.set(newConfig);
+            ModelController.setConfiguration(newConfig);
             result.statusCode = 200;
         } catch (error) {
             console.error(error);
@@ -228,7 +243,7 @@ exports.setConfiguration = function (request, result) {
 
 exports.getConfiguration = function (request, result) {
     try {
-        const configuration = config.get();
+        const configuration = ModelController.getConfiguration();
         result.statusCode = 200;
         result.setHeader('Content-Type', 'application/json');
         result.end(JSON.stringify(configuration));
