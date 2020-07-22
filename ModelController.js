@@ -3,10 +3,14 @@
 const merge = require('deepmerge');
 const util = require('./utilities.js');
 const Register = require('./Register.js');
+const ModelDataClient = require('./ModelDataClient.js');
 
 const CONFIG_FILE = 'config.json';
 
 var modelConfig = util.loadJsonFile(CONFIG_FILE);
+
+// const modelDataClient = new ModelDataClient(false, this.setData);
+// modelDataClient.callbacks.incomingDataListener = setData;
 
 exports.getConfiguration = function () {
     return modelConfig;
@@ -26,12 +30,14 @@ exports.getData = function () {
 exports.setData = function(dataPackets) {
     return new Promise((resolve, reject) => {
 
+        console.log(dataPackets);
+
         let errors = [];
 
         for (const dataPacket of dataPackets) {
             try {
                 console.log(dataPacket);
-                // console.log(dataPacket.index);
+                console.log(dataPacket.index);
                 let datum = modelConfig.data[dataPacket.index];
                 console.log(datum);
                 // console.log(modelConfig);
@@ -68,6 +74,7 @@ exports.setData = function(dataPackets) {
         }
         else {
             // TODO: what to return on success?
+            modelDataClient.sendObject(dataPackets);
             resolve({})
         }
     });
@@ -90,3 +97,7 @@ const combineMerge = (target, source, options) => {
     })
     return destination
 }
+
+
+var modelDataClient = ModelDataClient.create(false, this.setData);
+modelDataClient.startSession();

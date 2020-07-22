@@ -1,4 +1,4 @@
-// 'use strict';
+'use strict';
 
 const url = require('url');
 const util = require('./utilities.js');
@@ -19,17 +19,21 @@ exports.Init = function () {
 };
 
 exports.setModelData = function (request, result) {
-    let body = [];
+    let body = '';
 
-    request.on('data', (chunk) => {
-        body.push(chunk);
+    request.on('data', function (chunk) {
+        body += chunk;
     });
 
     request.on('end', () => {
         try {
-            // const dataPackets = JSON.parse(body);
-            const dataPackets = body;
-            console.log(dataPackets);
+            console.log(body);
+            // console.log(body.toString());
+            console.log(JSON.parse(body));
+            const dataPackets = JSON.parse(body).dataPackets;
+            // console.log(body.toJson());
+            // const dataPackets = body;
+            // console.log(dataPackets);
 
             const promise = ModelController.setData(dataPackets);
             promise.then((fulfilledResult) => {
