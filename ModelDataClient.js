@@ -5,10 +5,6 @@ let connection = new signalR.HubConnectionBuilder().withUrl("http://192.168.0.10
 
 class ModelDataClient {
     constructor(connected, callback) {
-        // if (!(this instanceof Square)) {
-        //     return new Square(width);
-        // }
-
         this.connected = connected;
         this.callback = callback;
     }
@@ -44,19 +40,8 @@ class ModelDataClient {
                 setTimeout(() => connection.start(), 5000);
                 return console.error(err.toString());
             });
-
     }
 
 }
 
-
-function create(connected, callback) {
-    return new ModelDataClient(connected, callback)
-}
-
-
-
-
-
-
-exports.create = create
+module.exports = ModelDataClient

@@ -99,5 +99,5 @@ const combineMerge = (target, source, options) => {
 }
 
 
-var modelDataClient = ModelDataClient.create(false, this.setData);
+var modelDataClient = new ModelDataClient(false, this.setData);
 modelDataClient.startSession();
