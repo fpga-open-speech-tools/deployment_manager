@@ -25,14 +25,8 @@ exports.setModelData = function (request, result) {
 
     request.on('end', () => {
         try {
-            // console.log(body);
-            // console.log(body.toString());
-            // console.log(JSON.parse(body));
-            const dataPackets = JSON.parse(body).dataPackets;
-            // console.log(body.toJson());
-            // const dataPackets = body;
-            // console.log(dataPackets);
-
+            const dataPackets = JSON.parse(body);
+            
             const promise = ModelController.setData(dataPackets);
             promise.then((fulfilledResult) => {
                 // console.log("successfully set model data");
