@@ -30,27 +30,27 @@ exports.getData = function () {
 exports.setData = function(dataPackets) {
     return new Promise((resolve, reject) => {
 
-        console.log(dataPackets);
+        // console.log(dataPackets);
 
         let errors = [];
 
         for (const dataPacket of dataPackets) {
             try {
-                console.log(dataPacket);
-                console.log(dataPacket.index);
+                // console.log(dataPacket);
+                // console.log(dataPacket.index);
                 let datum = modelConfig.data[dataPacket.index];
-                console.log(datum);
+                // console.log(datum);
                 // console.log(modelConfig);
 
-                if (datum.references[0].type === "register") {
+                if (datum.type === "register") {
                     const dataWritePromise = Register.write(
-                        datum.references[0].device, 
-                        datum.references[0].name,
+                        datum.device, 
+                        datum.name,
                         dataPacket.value
                     );
 
                     dataWritePromise.then((fulfilledResult) => {
-                        console.log(`successfully wrote ${dataPacket.value} to ${datum.references[0].device} ${datum.references[0].name}`);
+                        // console.log(`successfully wrote ${dataPacket.value} to ${datum.device} ${datum.name}`);
                         // data write was successful, so update the shadow in modelConfig
                         datum.value = dataPacket.value;
 

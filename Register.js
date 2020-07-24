@@ -30,45 +30,9 @@ function findMajorNumber (moduleName) {
     }
 };
 
-const mapLinkNamesToFilepaths = function(LinkerObject) {
-    let registerPaths = {};
-     
-    // TODO: naming consistency between module and device (they refer to the same thing here)
-
-    for (const device in LinkerObject) {
-        if (LinkerObject.hasOwnProperty(device)) {
-            const deviceObject = LinkerObject[device];
-            const links = deviceObject['links'];
-
-            registerPaths[device] = {};
-
-            // TODO: registerPaths probably shouldn't be populated if the driver isn't loaded. When a driver isn't loaded, we should tell the user about it.
-            const majorNumber = findMajorNumber(device);
-            const devicePath = createDevicePath(device, majorNumber);
-
-            for (const link in links) {
-                if (links.hasOwnProperty(link)) {
-                    const registerName = links[link];
-
-                    // XXX: registerName is assumed to have a leading / in the linker json. This should always be the case, but having some error handling would be nice
-                    registerPaths[device][link] = devicePath + registerName;
-                }
-            }
-        }
-    }
-    console.log(registerPaths);
-    return registerPaths;
-}
-
-exports.loadLinker = function(configPath) {
-    const LinkerObject = util.loadJsonFile(configPath + '/Linker.json');
-    const registerPaths = mapLinkNamesToFilepaths(LinkerObject);
-    return registerPaths;
-}
-
 exports.write = function(device, name ,value) {
     return new Promise((resolve, reject) => {
-        console.log(device, name, value);
+        // console.log(device, name, value);
 
         let errors = [];
 
@@ -80,7 +44,7 @@ exports.write = function(device, name ,value) {
             const devicePath = createDevicePath(device, majorNumber);
             const registerPath = devicePath + "/" + name;
 
-            console.log(registerPath);
+            // console.log(registerPath);
 
             fs.writeFile(registerPath, value, (err) => {
                 if (err) 
@@ -100,7 +64,7 @@ exports.write = function(device, name ,value) {
         } 
         else {
             // TODO: what to return on success?
-            console.log('success write');
+            // console.log('success write');
             resolve({});
         }
 

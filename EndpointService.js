@@ -1,9 +1,7 @@
 'use strict';
 
-const url = require('url');
 const util = require('./utilities.js');
 const fs = require('fs');
-const registers = require('./Register.js');
 const ModelController = require('./ModelController.js');
 
 const configPath = "../config"
@@ -27,9 +25,9 @@ exports.setModelData = function (request, result) {
 
     request.on('end', () => {
         try {
-            console.log(body);
+            // console.log(body);
             // console.log(body.toString());
-            console.log(JSON.parse(body));
+            // console.log(JSON.parse(body));
             const dataPackets = JSON.parse(body).dataPackets;
             // console.log(body.toJson());
             // const dataPackets = body;
@@ -37,7 +35,7 @@ exports.setModelData = function (request, result) {
 
             const promise = ModelController.setData(dataPackets);
             promise.then((fulfilledResult) => {
-                console.log("successfully set model data");
+                // console.log("successfully set model data");
 
                 result.status = 200;
                 result.end();
@@ -59,40 +57,6 @@ exports.setModelData = function (request, result) {
 
 exports.getModelData = function(request, result) {
     ModelController.getData();
-};
-
-
-var registerPaths = registers.loadLinker(configPath);
-
-
-exports.setCommandRequest = function (req, res) {
-    let body = [];
-
-    req.on('data', function (chunk) {
-        body.push(chunk);
-    });
-
-    req.on('end', function () {
-
-        try {
-            postBody = JSON.parse(body);
-            CommandObject = postBody;
-            
-            // console.log(registerPaths);
-            echoFile = registerPaths[CommandObject.module][CommandObject.link];
-
-            fs.writeFileSync(echoFile, CommandObject.value);
-
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(CommandObject));
-
-        }
-        catch (error) {
-            //Do Nothing ;)
-            console.error(error);
-        }
-    });
 };
 
 exports.getRegisterConfig = function (req, res) {
