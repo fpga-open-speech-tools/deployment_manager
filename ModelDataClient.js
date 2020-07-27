@@ -1,47 +1,54 @@
 'use strict';
 const signalR = require("@microsoft/signalr");
 
-let connection = new signalR.HubConnectionBuilder().withUrl("http://192.168.0.108:5002/model-data").build();
 
 class ModelDataClient {
-    constructor(connected, callback) {
+    constructor(url, connected, callback) {
+        this.url = url;
         this.connected = connected;
         this.callback = callback;
+
+        this.connection = new signalR.HubConnectionBuilder().withUrl(this.url).build();
     }
     doNothing(obj) {
     }
     sendObject(object) {
         // console.log('sendobject');
-        connection.invoke("ModelUpdated", object).catch(function (err) {
+        this.connection.invoke("ModelUpdated", object).catch(function (err) {
             return console.error(err.toString());
         });
     }
     verifyConnection() {
-        connection.invoke("AfterConnected").catch(function (err) {
+        this.connection.invoke("AfterConnected").catch(function (err) {
             return console.error(err.toString());
         });
     }
     startSession() {
 
-        connection.on("Connected", (message) => {
-            // console.log("connected");
+        this.connection.on("Connected", (message) => {
+            console.log("connected");
             this.connected = true;
         });
 
-        connection.on("Update", (obj) => {
-            // console.log("in update");
+        this.connection.on("Update", (obj) => {
+            console.log("in update");
             // console.log(obj);
-            return this.callback(obj.dataPackets)
+            return this.callback(obj)
         });
-        connection.start()
+
+        this.connection.start()
             .then(function (val) {
             }).then(res => this.verifyConnection())
             .catch(function (err) {
-                setTimeout(() => connection.start(), 5000);
+                setTimeout(() => this.connection.start(), 5000);
                 return console.error(err.toString());
             });
-    }
 
+        this.connection.onclose( () => {
+            console.log('closed');
+            this.connected = false;
+        });
+    }
 }
 
 module.exports = ModelDataClient

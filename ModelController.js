@@ -30,8 +30,6 @@ exports.getData = function () {
 exports.setData = function(dataPackets) {
     return new Promise((resolve, reject) => {
 
-        // console.log(dataPackets);
-
         let errors = [];
 
         for (const dataPacket of dataPackets) {
@@ -74,7 +72,6 @@ exports.setData = function(dataPackets) {
         }
         else {
             // TODO: what to return on success?
-            modelDataClient.sendObject(dataPackets);
             resolve({})
         }
     });
@@ -98,6 +95,3 @@ const combineMerge = (target, source, options) => {
     return destination
 }
 
-
-var modelDataClient = new ModelDataClient(false, this.setData);
-modelDataClient.startSession();

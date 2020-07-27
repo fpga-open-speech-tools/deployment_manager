@@ -3,6 +3,7 @@
 const util = require('./utilities.js');
 const fs = require('fs');
 const ModelController = require('./ModelController.js');
+const ModelDataClient = require('./ModelDataClient.js');
 
 const configPath = "../config"
 
@@ -11,6 +12,8 @@ var previousProjectName;
 var registerPaths = {};
 
 var CommandObject;
+
+var modelDataClient;
 
 exports.Init = function () {
     return;
@@ -53,85 +56,6 @@ exports.getModelData = function(request, result) {
     ModelController.getData();
 };
 
-exports.getRegisterConfig = function (req, res) {
-    let registers = {"registers": []};
-
-    for (const module in registerPaths) {
-        // console.log(module);
-        // console.log(registerPaths[module]);
-
-        for (const link in registerPaths[module]) {
-            // console.log(link);
-
-            // const value = util.readRegister(module, link)
-            registerPath = registerPaths[module][link];
-            const value = fs.readFileSync(registerPath, 'utf8').trim();
-
-            registerConfiguration = {
-                "module": module, "link": link, "value": value
-            };
-
-            // console.log(registerConfiguration);
-
-            registers["registers"].push(registerConfiguration);
-        }
-    }
-
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(registers));
-}
-
-exports.setRegisterConfig = function (req, res) {
-    let body = [];
-    console.log('in setRegisterConfig');
-
-    req.on('data', function (chunk) {
-        body.push(chunk);
-    });
-
-    req.on('end', function () {
-        console.log(body);
-
-        try {
-            registerConfig = JSON.parse(body);
-            console.log(registerConfig);
-
-            let UIObject = util.loadJsonFile(configPath + '/UI.json');
-
-            // write all of the registers
-            registerConfig['registers'].forEach(register => {
-                registerPath = registerPaths[register.module][register.link];
-                fs.writeFileSync(registerPath, register.value);        
-                // TODO: perform readback so we know that the write worked properly?
-            }); 
-
-            // update the register values in the UI config
-            UIObject['pages'].forEach(page => {
-               page['panels'].forEach(panel => {
-                   panel['controls'].forEach(control => {
-                       registerConfig['registers'].forEach(register => {
-                            if (register.module == control.module && 
-                                register.link == control.linkerName) {
-                                    control.defaultValue = register.value;
-                                    console.log(`set register value ${register.value} for control ${control.linkerName}`);
-                                }
-                       });
-                   });
-               }); 
-            });
-
-            res.status = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(UIObject));
-        }
-        catch(error) {
-            res.status = 500
-            // TODO: error handling and correct return code?
-            console.error(error);
-        }
-   });
-}
 
 exports.setDownloadRequest = function (req, res) {
     let body = '';
@@ -212,6 +136,52 @@ exports.getConfiguration = function (request, result) {
     } catch (error) {
         console.error(error);
     }
+};
+
+exports.connectSignalR = function(request, result) {
+    let connectionStatus = {rtcEnabled: false};
+    const port = 5000;
+
+    try {
+        let address = request.connection.remoteAddress;
+        console.log(address);
+
+        if (modelDataClient) {
+            console.log(modelDataClient.connected)
+            if(modelDataClient.connected){
+                console.log('already connected');
+                result.statusCode = 200;
+                connectionStatus.rtcEnabled = true;
+            }
+            else {
+                console.log('model data client not connected')
+                modelDataClient = new ModelDataClient(`http://${address}:${port}/model-data`, 
+                    false, ModelController.setData);
+                modelDataClient.startSession();
+
+                result.statusCode = 200;
+                connectionStatus.rtcEnabled = true;
+            }
+        }
+        else {
+            console.log('model data client undefined')
+            modelDataClient = new ModelDataClient(`http://${address}:${port}/model-data`, 
+                false, ModelController.setData);
+            modelDataClient.startSession();
+
+            result.statusCode = 200;
+            connectionStatus.rtcEnabled = true;
+        }
+    }
+    catch (error) {
+        // TODO: throw error from ModelDataClient when the url is bad and it doesn't connect,
+        // or maybe just check modelDataClient.connected instead of using try/catch? 
+        result.statusCode = 400;
+        console.log(error);
+    }
+
+    result.setHeader('Content-Type', 'application/json');
+    result.end(JSON.stringify(connectionStatus));
 };
 
 exports.invalidRequest = function (req, res) {
