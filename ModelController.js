@@ -4,8 +4,9 @@ const merge = require('deepmerge');
 const util = require('./utilities.js');
 const Register = require('./Register.js');
 const ModelDataClient = require('./ModelDataClient.js');
+const path = require('path');
 
-const CONFIG_FILE = 'config.json';
+const CONFIG_FILE = path.join(__dirname, 'config.json');
 
 var modelConfig = util.loadJsonFile(CONFIG_FILE);
 
@@ -18,7 +19,10 @@ exports.getConfiguration = function () {
 
 exports.setConfiguration = function (newConfig) {
     // console.log(config);
-    modelConfig = merge(modelConfig, newConfig, {arrayMerge : combineMerge});
+    modelConfig.views=newConfig.views;
+    modelConfig.containers=newConfig.containers;
+    modelConfig.name = newConfig.name;
+    //modelConfig = merge(modelConfig, newConfig, {arrayMerge : combineMerge});
     // console.log(config);
     util.saveJsonFile(CONFIG_FILE, modelConfig);
 }
