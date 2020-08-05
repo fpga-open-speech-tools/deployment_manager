@@ -7,7 +7,6 @@
   "bin": {
     "endpoint-server": "./EndpointServer.js"
   },
-  "files": ["config.json"],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
