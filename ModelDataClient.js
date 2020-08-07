@@ -26,12 +26,12 @@ class ModelDataClient {
     startSession() {
 
         this.connection.on("Connected", (message) => {
-            console.log("connected");
+            // console.log("connected");
             this.connected = true;
         });
 
         this.connection.on("Update", (obj) => {
-            console.log("in update");
+            // console.log("in update");
             // console.log(obj);
             return this.callback(obj)
         });
@@ -45,7 +45,7 @@ class ModelDataClient {
             });
 
         this.connection.onclose( () => {
-            console.log('closed');
+            // console.log('closed');
             this.connected = false;
         });
     }
