@@ -20,10 +20,64 @@ exports.loadJsonFile = function (filepath) {
 
 exports.saveJsonFile = function (filepath, jsonData) {
     fs.open;
-    fs.writeFile(filepath, JSON.stringify(jsonData), (err) => {
+    fs.writeFile(filepath, JSON.stringify(jsonData, null, '\t'), (err) => {
         if (err) {
             throw err;
         } 
     });
     fs.close;
+}
+
+exports.convertModelJsonToUIJson = function(filepath) {
+    model = exports.loadJsonFile(filepath)
+    ui = {}
+    ui.data = []
+    model.devices.forEach(device => {
+        device.registers.forEach(reg => {
+            const {min, max, step} = getMinMaxStep(reg.dataType)
+            uiReg = {
+                name: reg.name,
+                type: "register",
+                device: device.name,
+                value: reg.defaultValue,
+                properties: {
+                    min: min,
+                    max: max,
+                    step: step
+                }
+            }
+            ui.data.push(uiReg)
+        });
+    });
+    return ui
+}
+
+getMinMaxStep = function(reg) {
+    intMax = 0
+    fracMax = 0
+    
+    signBits = reg.signed ? 1 : 0
+    intBits = reg.wordLength - reg.fractionLength - signBits
+    
+    step = 1 / Math.pow(2, reg.fractionLength)
+
+    if (reg.fractionLength > reg.wordLength - signBits) {
+        actualFracBits =  reg.wordLength - signBits
+        min = reg.signed ? Math.pow(2, actualFracBits) / Math.pow(2, reg.fractionLength) : 0
+        max = (Math.pow(2, actualFracBits) - 1) / Math.pow(2, reg.fractionLength)
+        return {min: min, max: max, step: step}
+    }
+
+    if(intBits > 0){
+        intMax = Math.pow(2, intBits - 1)
+    }
+    if(reg.fractionLength > 0){
+        fracMax = 1 - 1 / Math.pow(2, reg.fractionLength)
+    }
+    min = reg.signed ? - (intMax + 1) : 0
+    max = intMax + fracMax
+    console.log(reg)
+    console.log(reg.fractionLength)
+    console.log(1 / Math.pow(2, reg.fractionLength))
+    return {min: min, max: max, step: step}
 }
