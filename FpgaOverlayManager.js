@@ -1,5 +1,7 @@
 'use strict';
 
+const util = require('./utilities.js');
+
 const SCRIPT_PATH = "../utils"
 
 exports.downloadAndInstall = function(s3dir, configPath) {
@@ -10,7 +12,7 @@ exports.downloadAndInstall = function(s3dir, configPath) {
 
 
         const { spawn } = require("child_process");
-        let downloadProc = spawn('python3', [SCRIPT_PATH + '/aws_overlay_installer.py', '-e', 'http://127.0.0.1:3355/set-download-progress', '-b', 'nih-demos', '-d', s3dir]);
+        let downloadProc = spawn('python3', [SCRIPT_PATH + '/aws_overlay_installer.py', '-b', 'nih-demos', '-d', s3dir]);
 
         downloadProc.stdout.on('data', (data) => {
             console.log(`stdout: ${data}`);
@@ -29,16 +31,14 @@ exports.downloadAndInstall = function(s3dir, configPath) {
                 // console.log(errors.toString());
                 // reject({code, errors});
                 if (code == 0) {
-                    registerPaths = loadLinker(configPath);
-                    resolve({code, registerPaths});
+                    resolve({code});
                 }
                 else {
                     reject({code});
                 }
             }
             else {
-                registerPaths = loadLinker(configPath);
-                resolve({code, registerPaths});
+                resolve({code});
             }
         });
     });
@@ -48,11 +48,17 @@ exports.remove = function(projectName) {
     const { exec } = require('child_process')
 
     let cmd = './' + SCRIPT_PATH + '/overlaymgr remove ' + projectName;
-    exec(cmd, execCB);
+    exec(cmd, util.execCB);
     cmd = './' + SCRIPT_PATH + '/drivermgr remove ' + projectName;
-    exec(cmd, execCB);
+    exec(cmd, util.execCB);
 }
 
+// TODO: the intent here is to separate out the download and installation processes;
+//       install can then be used to install local/cached projects
 exports.install = function(projectName) {
+
+}
+
+exports.download = function(projectName) {
 
 }
