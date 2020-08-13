@@ -69,15 +69,13 @@ getMinMaxStep = function(reg) {
     }
 
     if(intBits > 0){
-        intMax = Math.pow(2, intBits - 1)
+        intMax = Math.pow(2, intBits) - 1
     }
     if(reg.fractionLength > 0){
         fracMax = 1 - 1 / Math.pow(2, reg.fractionLength)
     }
     min = reg.signed ? - (intMax + 1) : 0
     max = intMax + fracMax
-    console.log(reg)
-    console.log(reg.fractionLength)
-    console.log(1 / Math.pow(2, reg.fractionLength))
+
     return {min: min, max: max, step: step}
 }
