@@ -8,7 +8,7 @@ const path = require('path');
 
 const CONFIG_FILE = path.join(__dirname, 'config.json');
 
-var modelConfig = util.loadJsonFile(CONFIG_FILE);
+var modelConfig = {};// util.loadJsonFile(CONFIG_FILE);
 
 // const modelDataClient = new ModelDataClient(false, this.setData);
 // modelDataClient.callbacks.incomingDataListener = setData;

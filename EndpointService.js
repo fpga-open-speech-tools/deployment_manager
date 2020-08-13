@@ -1,6 +1,7 @@
 'use strict';
 
 const util = require('./utilities.js');
+const overlayManager = require('./FpgaOverlayManager')
 const fs = require('fs');
 const ModelController = require('./ModelController.js');
 const ModelDataClient = require('./ModelDataClient.js');
@@ -67,25 +68,21 @@ exports.setDownloadRequest = function (req, res) {
     req.on('end', function () {
 
         try {
-            postBody = JSON.parse(body);
+            let postBody = JSON.parse(body);
             CommandObject = postBody;
 
             // previous overlay needs to be removed before loading in a new one
             if (previousProjectName) {
-                util.removePreviousOverlay(previousProjectName);
+                overlayManager.remove(previousProjectName);
             }
 
-            // reset progress back to 0 before downloading
-            progress = '{"progress": 0, "status": ""}';
-
-            var downloadPromise = util.downloadInstallOverlay(CommandObject.downloadurl, configPath);
+            var downloadPromise = overlayManager.downloadAndInstall(CommandObject.downloadurl, configPath);
 
             downloadPromise.then((result) => {
                 console.log("success");
 
-                registerPaths = result.registerPaths;
-                console.log(registerPaths);
-
+                // TODO: the FpgaOverlayManager should know about the previous project it loaded, so it can
+                //       handle removing overlays by itself. 
                 previousProjectName = CommandObject.projectname.replace('-', '_');
 
                 res.statusCode = 200;
