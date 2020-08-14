@@ -79,13 +79,23 @@ exports.setDownloadRequest = function (req, res) {
             var downloadPromise = overlayManager.downloadAndInstall(CommandObject.downloadurl, configPath);
 
             downloadPromise.then((result) => {
-                console.log("success");
-
+                let status = "success"
+                res.statusCode = 200;
+                if (!fs.existsSync('../config/ui.json') ) {
+                    if(fs.existsSync('../config/model.json')){
+                        ModelController.setModelConfig(util.convertModelJsonToUIJson('../config/model.json'))
+                    }
+                    else {
+                        status = "no configuation";
+                        res.statusCode = 400
+                    }
+                }
+                console.log(status)
                 // TODO: the FpgaOverlayManager should know about the previous project it loaded, so it can
                 //       handle removing overlays by itself. 
                 previousProjectName = CommandObject.projectname.replace('-', '_');
 
-                res.statusCode = 200;
+                
                 res.setHeader('Content-Type', 'application/json');
                 res.end(JSON.stringify(CommandObject));
             }, (result) => {

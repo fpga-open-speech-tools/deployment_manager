@@ -31,6 +31,10 @@ exports.getData = function () {
     return modelConfig.data;
 }
 
+exports.setModelConfig = function (newModelConfig){
+    modelConfig = newModelConfig
+}
+
 exports.setData = function(dataPackets) {
     return new Promise((resolve, reject) => {
 
