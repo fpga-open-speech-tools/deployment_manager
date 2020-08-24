@@ -32,6 +32,12 @@ exports.getData = function () {
 }
 
 exports.setModelConfig = function (newModelConfig){
+    if(!newModelConfig.views){
+        newModelConfig.views = []
+    }
+    if(!newModelConfig.containers){
+        newModelConfig.containers = []
+    }
     modelConfig = newModelConfig
 }
 
@@ -47,7 +53,7 @@ exports.setData = function(dataPackets) {
                 let datum = modelConfig.data[dataPacket.index];
                 // console.log(datum);
                 // console.log(modelConfig);
-
+                
                 if (datum.type === "register") {
                     const dataWritePromise = Register.write(
                         datum.device, 

@@ -31,20 +31,30 @@ exports.saveJsonFile = function (filepath, jsonData) {
 exports.convertModelJsonToUIJson = function(filepath) {
     model = exports.loadJsonFile(filepath)
     ui = {}
+    ui.name = ""
     ui.data = []
     model.devices.forEach(device => {
         device.registers.forEach(reg => {
-            const {min, max, step} = getMinMaxStep(reg.dataType)
+            if(reg.dataType.wordLength == 1){
+                properties = {
+                    enumeration: ["Disable", "Enable"]
+                }
+            }
+            else {
+                const {min, max, step} = getMinMaxStep(reg.dataType)
+                properties = {
+                    min: min,
+                    max: max,
+                    step: step
+                }
+            }
+            
             uiReg = {
                 name: reg.name,
                 type: "register",
                 device: device.name,
                 value: reg.defaultValue,
-                properties: {
-                    min: min,
-                    max: max,
-                    step: step
-                }
+                properties
             }
             ui.data.push(uiReg)
         });
