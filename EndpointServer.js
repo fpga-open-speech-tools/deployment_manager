@@ -11,7 +11,7 @@ const server = require('./EndpointController.js');
 const service = require('./EndpointService.js');
 service.Init();
 // TODO: listen on lo and eth0 and wlan?
-server.listen(port, ip, () => {
+server.listen(port, '0.0.0.0', () => {
     console.log(`Server running at http://${ip}:${port}/`);
 });
 

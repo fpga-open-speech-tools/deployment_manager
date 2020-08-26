@@ -20,9 +20,9 @@ module.exports = http.createServer((request, result) => {
     else if (reqUrl.pathname == '/configuration' && request.method === 'GET') {
         service.getConfiguration(request, result); 
     }
-    else if(reqUrl.pathname == '/download' && request.method === 'POST') {
-        service.setDownloadRequest(request, result); 
-    } 
+    else if(reqUrl.pathname == '/download' && request.method === 'PUT') {
+        service.setDownloadRequest(request, result);
+    }    
     else if(reqUrl.pathname == '/connect-rtc' && request.method === 'GET') {
         service.connectSignalR(request, result);
     }

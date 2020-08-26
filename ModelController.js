@@ -8,7 +8,7 @@ const path = require('path');
 
 const CONFIG_FILE = path.join(__dirname, 'config.json');
 
-var modelConfig = util.loadJsonFile(CONFIG_FILE);
+var modelConfig = {};// util.loadJsonFile(CONFIG_FILE);
 
 // const modelDataClient = new ModelDataClient(false, this.setData);
 // modelDataClient.callbacks.incomingDataListener = setData;
@@ -31,6 +31,16 @@ exports.getData = function () {
     return modelConfig.data;
 }
 
+exports.setModelConfig = function (newModelConfig){
+    if(!newModelConfig.views){
+        newModelConfig.views = []
+    }
+    if(!newModelConfig.containers){
+        newModelConfig.containers = []
+    }
+    modelConfig = newModelConfig
+}
+
 exports.setData = function(dataPackets) {
     return new Promise((resolve, reject) => {
 
@@ -43,7 +53,7 @@ exports.setData = function(dataPackets) {
                 let datum = modelConfig.data[dataPacket.index];
                 // console.log(datum);
                 // console.log(modelConfig);
-
+                
                 if (datum.type === "register") {
                     const dataWritePromise = Register.write(
                         datum.device, 
