@@ -126,11 +126,13 @@ exports.setConfiguration = function (request, result) {
             const newConfig = JSON.parse(body);
             ModelController.setConfiguration(newConfig);
             result.statusCode = 200;
+            result.setHeader('Content-Type', 'application/json');
+            result.end(JSON.stringify(ModelController.getConfiguration()))
         } catch (error) {
             console.error(error);
+            result.statusCode = 500;
+            result.end();
         }
-
-        result.end();
     });
 };
 

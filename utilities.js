@@ -37,7 +37,27 @@ exports.convertModelJsonToUIJson = function(filepath) {
         device.registers.forEach(reg => {
             if(reg.dataType.wordLength == 1){
                 properties = {
-                    enumeration: ["Disable", "Enable"]
+                    enumerations: [
+                        {
+                            "key": "Enable",
+                            "value": 1
+                        },
+                        {
+                            "key": "Disable",
+                            "value": 0
+                        }
+                    ]
+                }
+            }
+            else if(reg.enumerations){
+                properties = {
+                    enumerations: Object.keys(reg.enumerations).map(key => {
+                        let result = {
+                            "key": key,
+                            "value": reg.enumerations[key]
+                        }
+                        return result
+                      })
                 }
             }
             else {
