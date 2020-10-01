@@ -109,7 +109,6 @@ const combineMerge = (target, source, options) => {
     })
     return destination
 }
-
 if (fs.existsSync('./ui.json')) {
     exports.setModelConfig(util.loadJsonFile('./ui.json'));
 }
