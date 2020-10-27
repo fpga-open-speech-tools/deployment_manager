@@ -76,7 +76,7 @@ exports.setDownloadRequest = function (req, res) {
                 overlayManager.remove(previousProjectName);
             }
 
-            var downloadPromise = overlayManager.downloadAndInstall(CommandObject.downloadurl, configPath);
+            var downloadPromise = overlayManager.downloadAndInstall(CommandObject.bucketname, CommandObject.downloadurl, configPath);
 
             downloadPromise.then((result) => {
                 let status = "success"
