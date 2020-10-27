@@ -4,7 +4,7 @@ const util = require('./utilities.js');
 
 const SCRIPT_PATH = "../utils/runtime_config"
 
-exports.downloadAndInstall = function(s3dir, configPath) {
+exports.downloadAndInstall = function(s3bucket, s3dir, configPath) {
     return new Promise((resolve, reject) => {
 
         let errors = [];
@@ -12,7 +12,7 @@ exports.downloadAndInstall = function(s3dir, configPath) {
 
 
         const { spawn } = require("child_process");
-        let downloadProc = spawn('python3', [SCRIPT_PATH + '/aws_overlay_installer.py', '-b', 'nih-demos', '-d', s3dir]);
+        let downloadProc = spawn('python3', [SCRIPT_PATH + '/aws_overlay_installer.py', '-b', s3bucket, '-d', s3dir]);
 
         downloadProc.stdout.on('data', (data) => {
             console.log(`stdout: ${data}`);

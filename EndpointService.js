@@ -76,7 +76,7 @@ exports.setDownloadRequest = function (req, res) {
                 overlayManager.remove(previousProjectName);
             }
 
-            var downloadPromise = overlayManager.downloadAndInstall(CommandObject.downloadurl, configPath);
+            var downloadPromise = overlayManager.downloadAndInstall(CommandObject.bucketname, CommandObject.downloadurl, configPath);
 
             downloadPromise.then((result) => {
                 let status = "success"
@@ -126,11 +126,13 @@ exports.setConfiguration = function (request, result) {
             const newConfig = JSON.parse(body);
             ModelController.setConfiguration(newConfig);
             result.statusCode = 200;
+            result.setHeader('Content-Type', 'application/json');
+            result.end(JSON.stringify(ModelController.getConfiguration()))
         } catch (error) {
             console.error(error);
+            result.statusCode = 500;
+            result.end();
         }
-
-        result.end();
     });
 };
 

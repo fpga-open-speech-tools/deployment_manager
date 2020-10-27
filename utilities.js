@@ -33,12 +33,29 @@ exports.convertModelJsonToUIJson = function(filepath) {
     ui = {}
     ui.name = ""
     ui.data = []
+    ui.options = []
+    numOfRegsRead = 0
     model.devices.forEach(device => {
-        device.registers.forEach(reg => {
+        device.registers.forEach((reg, index) => {
+            let properties = {}
             if(reg.dataType.wordLength == 1){
                 properties = {
                     enumeration: ["Disable", "Enable"]
                 }
+            }
+            else if(reg.enumerations){
+                option = {
+                    data: [index + numOfRegsRead],
+                    enumerations: Object.keys(reg.enumerations).map(key => {
+                        let result = {
+                            "key": key,
+                            "value": reg.enumerations[key]
+                        }
+                        return result
+                      })
+                }
+                properties = {enumerations: []}
+                ui.options.push(option)
             }
             else {
                 const {min, max, step} = getMinMaxStep(reg.dataType)
@@ -58,6 +75,7 @@ exports.convertModelJsonToUIJson = function(filepath) {
             }
             ui.data.push(uiReg)
         });
+        numOfRegsRead += device.registers.length
     });
     return ui
 }
