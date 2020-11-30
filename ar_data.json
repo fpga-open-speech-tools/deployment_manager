@@ -1,0 +1,29 @@
+{
+    "inputs": [
+        {
+            "name": "Attack",
+            "min": 0,
+            "max": 250,
+            "step": 1,
+            "units": "milliseconds"
+        },
+        {
+            "name": "Release",
+            "min": 0,
+            "max": 250,
+            "step": 1,
+            "units": "milliseconds"
+        }
+    ],
+    "groups": [
+        "0-250 (Hz)",
+        "250-500 (Hz)",
+        "500-750 (Hz)",
+        "750-1k (Hz)",
+        "1k-2k (Hz)",
+        "2k-4k (Hz)",
+        "4k-12k (Hz)",
+        "12k-24k (Hz)"
+    ],
+    "functions":[]
+}
