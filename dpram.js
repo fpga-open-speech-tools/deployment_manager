@@ -42,7 +42,7 @@ let parse = (model, ui) => {
 
             let [references, ] = getData(ui, dpram);
 
-            processingButtonReferences = processingButtonReferences.concat(references)
+            processingButtonReferences = references.concat(processingButtonReferences)
             let processingButton = createView("Process " + dpram.name, "ProcessingButton", "standard", processingButtonReferences, [])
             addViewToContainer(ui, processingButton, "Processing")
 
