@@ -223,4 +223,15 @@ let findDPRAM = (device) =>{
     return dprams;
 }
 
+let hasDPRAM = (model) => {
+    let result = false
+    model.devices.forEach(device =>{
+        let dprams = findDPRAM(device);
+        if(dprams.length > 0)
+            result = true
+    })
+    return result
+}
+
 exports.parse = parse;
+exports.hasDPRAM = hasDPRAM;

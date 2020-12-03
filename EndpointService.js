@@ -5,6 +5,7 @@ const overlayManager = require('./FpgaOverlayManager')
 const fs = require('fs');
 const ModelController = require('./ModelController.js');
 const ModelDataClient = require('./ModelDataClient.js');
+const dpram = require('./dpram')
 
 const configPath = "../config"
 
@@ -83,7 +84,12 @@ exports.setDownloadRequest = function (req, res) {
                 res.statusCode = 200;
                 if (!fs.existsSync('../config/ui.json') ) {
                     if(fs.existsSync('../config/model.json')){
-                        ModelController.setModelConfig(util.convertModelJsonToUIJson('../config/model.json'))
+                        let ui = util.convertModelJsonToUIJson('../config/model.json')
+                        let model = util.loadJsonFile('../config/model.json')
+                        if(dpram.hasDPRAM(model)){
+                            dpram.parse(model, ui)
+                        }
+                        ModelController.setModelConfig(ui)
                     }
                     else {
                         status = "no configuation";
