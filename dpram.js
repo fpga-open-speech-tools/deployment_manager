@@ -6,19 +6,19 @@ let parse = (model, ui) => {
         let dprams = findDPRAM(device);
         let config = {}
         dprams.forEach(dpram =>{
-            filename = dpram.name + ".json";
+            let filename = "../config/" + dpram.name + ".json";
             if(fs.existsSync(filename)){
                 config = utils.loadJsonFile(filename)
             }
             else{
                 errorView = createView(`No config found for ${dpram.name} DPRAM, expected to find ${filename}`, "Text", "default", [], [])
-                addViewToContainer(model, errorView, dpram.name);
+                addViewToContainer(ui, errorView, dpram.name);
                 return;
             }
 
             if(!validate(config)){
                 errorView = createView(`Invalid config for ${dpram.name} DPRAM`, "Text", "default", [], [])
-                addViewToContainer(model, errorView, dpram.name);
+                addViewToContainer(ui, errorView, dpram.name);
                 return;
             }
 
