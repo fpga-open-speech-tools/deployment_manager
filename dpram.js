@@ -61,7 +61,7 @@ let validate = (dpramConfig) => true;
 
 let getViewType = (input) => {
     if(Array.isArray(input) && input.length == 2)
-        return ["Slider", "ranged"]
+        return ["TwoHandleSlider", "standard"]
     if(input.min == 0 && input.max == 1 && input.step == 1)
         return ["Toggle", "standard"]
     return ["Slider", "horizontal"]
