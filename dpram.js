@@ -22,11 +22,13 @@ let parse = (model, ui) => {
                 return;
             }
 
-            config.groups.forEach(group =>{
+            let processingButtonReferences = []
+
+            config.groups.forEach((group, groupIndex) =>{
                 config.inputs.forEach(input => {
-                    let [references, optionsIndex] = addData(ui, device, input)
+                    let [references, optionsIndex] = addData(ui, device, input, groupIndex)
                     let [viewType, viewVariant] = getViewType(input)
-                    //let (references, optionsIndex) = getData(model, input);
+                    //let (references, optionsIndex) = getData(ui, input);
                     let inputName = input.name
                     if(Array.isArray(input))
                         inputName = input.map(x => x.name).join("_")
@@ -34,9 +36,22 @@ let parse = (model, ui) => {
                     let view = createView(group + "_" + inputName, viewType, viewVariant, references, optionsIndex)
 
                     addViewToContainer(ui, view, group);
+                    processingButtonReferences = processingButtonReferences.concat(references)
                 });
-            })
-            //addButton(model, config.function);
+            });
+
+            let [references, ] = getData(ui, dpram);
+
+            processingButtonReferences = processingButtonReferences.concat(references)
+            let processingButton = createView("Process " + dpram.name, "ProcessingButton", "standard", processingButtonReferences, [])
+            addViewToContainer(ui, processingButton, "Processing")
+
+            let processingOutputView = createView("Processing Output " + dpram.name, "Text", "standard", references, optionsIndex)
+            addViewToContainer(ui, processingOutputView, "Processing")
+
+            let option = createProcessingOption(ui, config, processingButtonReferences)
+            addOption(ui, option)
+
         });
     });
 
@@ -48,36 +63,56 @@ let getViewType = (input) => {
     if(Array.isArray(input) && input.length == 2)
         return ["Slider", "ranged"]
     if(input.min == 0 && input.max == 1 && input.step == 1)
-        return ["Toggle", "default"]
+        return ["Toggle", "standard"]
     return ["Slider", "horizontal"]
 }
 
-let addData = (model, device, input) => {
+let addOption = (ui, option) => {
+    return ui.options.push(option) - 1
+}
+
+let addData = (ui, device, input, nameId='') => {
     let references = []
     optionsIndex = []
 
     if(Array.isArray(input)) {
-        input.forEach( subInput => {
-            [tempRef, tempOpt] = addData(model, device, subInput)
+        input.forEach((subInput, inputIndex) => {
+            [tempRef, tempOpt] = addData(ui, device, subInput, nameId)
             references = references.concat(tempRef)
             optionsIndex = optionsIndex.concat(tempOpt)
+
+            let option
+            if(inputIndex == 0){
+                option = {
+                    data: [tempRef[0]],
+                    // This is essentially hardcoding since there is no reason for it to be the next data
+                    union: tempRef[0] + 1, 
+                }
+            }
+            else {
+                option = {
+                    data: [tempRef[0]],
+                    noDisplay: true
+                }
+            }
+            
+            optionsIndex.push(addOption(ui,option))
         })
         return [references, optionsIndex]
     }
 
-
     let dpramRegister = {
-        name: input.name,
+        name: (input.name + nameId),
         type: "user-only",
         device: device.name,
-        value: 0, //TODO: Add default value somewhere
+        value: input.value,
         properties: {
             min: input.min,
             max: input.max,
             step: input.step
         }
     }
-    references.push(model.data.push(dpramRegister) - 1)
+    references.push(ui.data.push(dpramRegister) - 1)
     return [references, optionsIndex]
 }
 
@@ -130,6 +165,52 @@ let addViewToContainer = (model, input, panel) => {
     if(model.containers[panelIndex].views.indexOf(viewIndex) == -1  ) {
         model.containers[panelIndex].views.push(viewIndex);
     }
+}
+
+let createProcessingOption = (ui, dpram, dpramReferences) => {
+    let option = {
+        data: [dpramReferences[dpramReferences.length-1]],
+        processing: {
+            functions: dpram.processing.initFunctions,
+            inputs: [],
+            output: dpram.processing.output
+        }
+    }
+
+    dpram.groups.forEach((group, groupIndex) => {
+        dpram.processing.groupFunctions.forEach((func) => {
+            let tempFunc = {}
+            tempFunc.output_name = func.output_name.replace("${index}", groupIndex)
+            tempFunc.function = func.function.replace("${index}", groupIndex)
+            option.processing.functions = option.processing.functions.concat(tempFunc)
+        });
+    });
+
+    dpram.processing.inputs.forEach( (input) =>{
+        if(!input.name.includes("${index}")){
+            option.processing.inputs = option.processing.inputs.concat(input)
+            return
+        }
+        dpram.groups.forEach((group, groupIndex) => {
+            let numInputs = (dpramReferences.length - 1) / dpram.groups.length
+            let dpramInput = {}
+            if(Array.isArray(input.value)){
+                dpramInput = dpram.inputs[input.value[0]][input.value[1]]
+            }
+            else{
+                dpramInput = dpram.inputs[input.value]
+            }
+            let tempInput = {
+                name: input.name.replace("${index}", groupIndex),
+                type: input.type,
+                value: ui.data.findIndex((datum) => datum.name == (dpramInput.name + groupIndex))
+            }
+            option.processing.inputs = option.processing.inputs.concat(tempInput)
+        })
+    })
+
+    option.processing.functions = option.processing.functions.concat(dpram.processing.endFunctions)
+    return option
 }
 
 let findDPRAM = (device) =>{
