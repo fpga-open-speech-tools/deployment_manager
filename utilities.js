@@ -67,10 +67,14 @@ exports.convertModelJsonToUIJson = function(filepath) {
                     step: step
                 }
             }
-            
+            let type = "register"
+            if (reg.dataType.dpram){
+                type = "dpr"
+            }
+
             uiReg = {
                 name: reg.name,
-                type: "register",
+                type: type,
                 device: device.name,
                 value: reg.defaultValue,
                 properties
