@@ -73,14 +73,13 @@ let addOption = (ui, option) => {
 
 let addData = (ui, device, input, nameId='') => {
     let references = []
-    optionsIndex = []
+    let optionsIndex = []
 
     if(Array.isArray(input)) {
         input.forEach((subInput, inputIndex) => {
             [tempRef, tempOpt] = addData(ui, device, subInput, nameId)
             references = references.concat(tempRef)
             optionsIndex = optionsIndex.concat(tempOpt)
-
             let option
             if(inputIndex == 0){
                 option = {
