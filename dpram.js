@@ -43,14 +43,17 @@ let parse = (model, ui) => {
             let [references, ] = getData(ui, dpram);
 
             processingButtonReferences = references.concat(processingButtonReferences)
-            let processingButton = createView("Process " + dpram.name, "ProcessingButton", "standard", processingButtonReferences, [])
-            addViewToContainer(ui, processingButton, "Processing")
-
-            let processingOutputView = createView("Processing Output " + dpram.name, "Text", "standard", references, optionsIndex)
-            addViewToContainer(ui, processingOutputView, "Processing")
 
             let option = createProcessingOption(ui, config, processingButtonReferences)
-            addOption(ui, option)
+            let optionIndex = addOption(ui, option)
+
+            let processingButton = createView("Process " + dpram.name, "ProcessingButton", "standard", processingButtonReferences, [optionIndex])
+            addViewToContainer(ui, processingButton, "Processing")
+
+            let processingOutputView = createView("Processing Output " + dpram.name, "Text", "standard", references, [])
+            addViewToContainer(ui, processingOutputView, "Processing")
+
+            
 
         });
     });
