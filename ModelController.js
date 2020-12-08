@@ -73,7 +73,7 @@ exports.setData = function(dataPackets) {
                     });
                 }
                 else {
-                    errors.append(`data type ${datum.type} is not supported`);
+                    errors.push(`data type ${datum.type} is not supported`);
                 }
 
             } 
