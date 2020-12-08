@@ -6,6 +6,7 @@ const Register = require('./Register.js');
 const ModelDataClient = require('./ModelDataClient.js');
 const path = require('path');
 const fs = require('fs');
+const { deflateSync } = require('zlib');
 
 const CONFIG_FILE = path.join(__dirname, 'config.json');
 
@@ -55,7 +56,7 @@ exports.setData = function(dataPackets) {
                 // console.log(datum);
                 // console.log(modelConfig);
                 
-                if (datum.type === "register") {
+                if (datum.type === "register" || datum.type === "dpr") {
                     const dataWritePromise = Register.write(
                         datum.device, 
                         datum.name,
