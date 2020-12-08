@@ -182,8 +182,8 @@ let createProcessingOption = (ui, dpram, dpramReferences) => {
     dpram.groups.forEach((group, groupIndex) => {
         dpram.processing.groupFunctions.forEach((func) => {
             let tempFunc = {}
-            tempFunc.output_name = func.output_name.replace("${index}", groupIndex)
-            tempFunc.function = func.function.replace("${index}", groupIndex)
+            tempFunc.output_name = func.output_name.replaceAll("${index}", groupIndex)
+            tempFunc.function = func.function.replaceAll("${index}", groupIndex)
             option.processing.functions = option.processing.functions.concat(tempFunc)
         });
     });
@@ -203,7 +203,7 @@ let createProcessingOption = (ui, dpram, dpramReferences) => {
                 dpramInput = dpram.inputs[input.value]
             }
             let tempInput = {
-                name: input.name.replace("${index}", groupIndex),
+                name: input.name.replaceAll("${index}", groupIndex),
                 type: input.type,
                 value: ui.data.findIndex((datum) => datum.name == (dpramInput.name + groupIndex))
             }
