@@ -1,6 +1,10 @@
 const utils = require('./utilities.js');
 const fs = require('fs');
 
+let addViewToContainer = utils.addViewToContainer,
+    createView = utils.createView,
+    getViewType = utils.getViewType;
+
 let parse = (model, ui) => {
     model.devices.forEach(device =>{
         let dprams = findDPRAM(device);
@@ -61,14 +65,6 @@ let parse = (model, ui) => {
 }
 
 let validate = (dpramConfig) => true;
-
-let getViewType = (input) => {
-    if(Array.isArray(input) && input.length == 2)
-        return ["TwoHandleSlider", "standard"]
-    if(input.min == 0 && input.max == 1 && input.step == 1)
-        return ["Toggle", "standard"]
-    return ["Slider", "horizontal"]
-}
 
 let addOption = (ui, option) => {
     return ui.options.push(option) - 1
@@ -134,39 +130,6 @@ let getData = (model, input) => {
     optionsIndex.push(model.options.findIndex(option => option.name == input.name))
 
     return [references, optionsIndex]
-}
-
-
-let createView = (name, viewType, variant, references, optionsIndex)  => {
-    return {"name": name,
-        "type":{
-            "component": viewType,
-            "variant": variant
-        },
-        "references": references,
-        "optionsIndex": optionsIndex
-    }
-}
-
-let addViewToContainer = (model, input, panel) => {
-    let panelIndex = model.containers.findIndex(container => container.name == panel);
-
-    if(panelIndex == -1){
-        let container = {
-            name: panel,
-            views: []
-        }
-        panelIndex = model.containers.push(container) - 1;
-    }
-
-    let viewIndex = model.views.indexOf(input);
-    if(viewIndex == -1){
-        viewIndex = model.views.push(input) - 1;
-    }
-
-    if(model.containers[panelIndex].views.indexOf(viewIndex) == -1  ) {
-        model.containers[panelIndex].views.push(viewIndex);
-    }
 }
 
 let createProcessingOption = (ui, dpram, dpramReferences) => {
