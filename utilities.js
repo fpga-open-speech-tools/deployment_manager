@@ -38,8 +38,28 @@ exports.convertModelJsonToUIJson = function(filepath) {
     ui.views = []
     ui.options = []
     numOfRegsRead = 0
+    
+    let dataIndex = 0, optionsLength = 0;
+
     model.devices.forEach(device => {
-        let dataIndex = 0, optionsLength = 0;
+        if(device.description){
+            let deviceDescriptionData = {
+                name: `${device.name} description`,
+                value: device.description,
+                type: "user-only",
+                device: device.name,
+                properties: {
+                    min: 0,
+                    max: 0,
+                    step: 0
+                }
+            }
+            dataIndex = ui.data.push(deviceDescriptionData) - 1
+            let deviceDescriptionView = createView(`${device.name} Description`, "Text", "default", [dataIndex], [])
+            addViewToContainer(ui, deviceDescriptionView, device.name)
+            dataIndex = dataIndex + 1
+        }
+
         device.registers.forEach(reg => {
             let [uiReg, option] = createData(device, reg, dataIndex)
 
