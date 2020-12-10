@@ -55,7 +55,7 @@ exports.convertModelJsonToUIJson = function(filepath) {
                 }
             }
             dataIndex = ui.data.push(deviceDescriptionData) - 1
-            let deviceDescriptionView = createView(`${device.name} Description`, "Text", "default", [dataIndex], [])
+            let deviceDescriptionView = createView("", "Text", "default", [dataIndex], [])
             addViewToContainer(ui, deviceDescriptionView, device.name)
             dataIndex = dataIndex + 1
         }
