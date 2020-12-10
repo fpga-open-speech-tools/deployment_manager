@@ -10,9 +10,10 @@ let parse = (model, ui) => {
         let dprams = findDPRAM(device);
         let config = {}
         dprams.forEach(dpram =>{
-            let filename = "../config/" + dpram.name + ".json";
-            if(fs.existsSync(filename)){
-                config = utils.loadJsonFile(filename)
+            let filename = dpram.name + ".json"
+            let filepath = "../config/" + filename;
+            if(fs.existsSync(filepath)){
+                config = utils.loadJsonFile(filepath)
             }
             else{
                 let errorMsg = `No config found for ${dpram.name} DPRAM, expected to find ${filename}`
