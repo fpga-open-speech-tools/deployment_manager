@@ -141,7 +141,7 @@ let getMinMaxStep = function(reg) {
 let getViewType = (input) => {
     if(Array.isArray(input) && input.length == 2)
         return ["TwoHandleSlider", "standard"]
-    if(input.min == 0 && input.max == 1 && input.step == 1)
+    if(input.min == 0 && input.max == 1 && input.step == 1 || (input.properties && input.properties.enumeration))
         return ["Toggle", "standard"]
     if(input.properties && input.properties.enumerations)
         return ["RadioToggle", "standard"]

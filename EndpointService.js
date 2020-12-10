@@ -86,6 +86,7 @@ exports.setDownloadRequest = function (req, res) {
                     if(fs.existsSync('../config/model.json')){
                         let ui = util.convertModelJsonToUIJson('../config/model.json')
                         let model = util.loadJsonFile('../config/model.json')
+                        console.log(ui)
                         if(dpram.hasDPRAM(model)){
                             dpram.parse(model, ui)
                         }
