@@ -98,22 +98,22 @@ let addData = (ui, device, input, nameId='') => {
             [tempRef, tempOpt] = addData(ui, device, subInput, nameId)
             references = references.concat(tempRef)
             optionsIndex = optionsIndex.concat(tempOpt)
-            let option
-            if(inputIndex == 0){
-                option = {
-                    data: [tempRef[0]],
-                    // This is essentially hardcoding since there is no reason for it to be the next data
-                    union: tempRef[0] + 1, 
-                }
-            }
-            else {
-                option = {
-                    data: [tempRef[0]],
-                    noDisplay: true
-                }
-            }
+            // let option
+            // if(inputIndex == 0){
+            //     option = {
+            //         data: [tempRef[0]],
+            //         // This is essentially hardcoding since there is no reason for it to be the next data
+            //         union: tempRef[0] + 1, 
+            //     }
+            // }
+            // else {
+            //     option = {
+            //         data: [tempRef[0]],
+            //         noDisplay: true
+            //     }
+            // }
             
-            optionsIndex.push(addOption(ui,option))
+            // optionsIndex.push(addOption(ui,option))
         })
         return [references, optionsIndex]
     }
