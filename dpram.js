@@ -15,13 +15,31 @@ let parse = (model, ui) => {
                 config = utils.loadJsonFile(filename)
             }
             else{
-                errorView = createView(`No config found for ${dpram.name} DPRAM, expected to find ${filename}`, "Text", "default", [], [])
+                let errorMsg = `No config found for ${dpram.name} DPRAM, expected to find ${filename}`
+                let errorInput = {
+                    name: `error ${dpram.name}`,
+                    value: errorMsg,
+                    min: 0,
+                    max: 0,
+                    step: 0
+                }
+                let [references, optionsIndex] = addData(ui, device, errorInput)
+                errorView = createView("Error", "Text", "default", [references], [])
                 addViewToContainer(ui, errorView, dpram.name);
                 return;
             }
 
             if(!validate(config)){
-                errorView = createView(`Invalid config for ${dpram.name} DPRAM`, "Text", "default", [], [])
+                let errorMsg = `Invalid config for ${dpram.name} DPRAM`
+                let errorInput = {
+                    name: `error ${dpram.name}`,
+                    value: errorMsg,
+                    min: 0,
+                    max: 0,
+                    step: 0
+                }
+                let [references, optionsIndex] = addData(ui, device, errorInput)
+                errorView = createView("Error", "Text", "default", [references], [])
                 addViewToContainer(ui, errorView, dpram.name);
                 return;
             }
