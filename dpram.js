@@ -184,10 +184,12 @@ let createProcessingOption = (ui, dpram, dpramReferences) => {
             else{
                 dpramInput = dpram.inputs[input.value]
             }
+            let dataIndex =  ui.data.findIndex((datum) => datum.name == (dpramInput.name + groupIndex));
+            let referencesIndex = dpramReferences.findIndex((ref) => ref == dataIndex)
             let tempInput = {
                 name: input.name.replace(/\${index}/g, groupIndex),
                 type: input.type,
-                value: ui.data.findIndex((datum) => datum.name == (dpramInput.name + groupIndex))
+                value: referencesIndex
             }
             option.processing.inputs = option.processing.inputs.concat(tempInput)
         })
