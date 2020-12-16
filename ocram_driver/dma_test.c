@@ -251,15 +251,15 @@ static ssize_t address_write(struct device *dev, struct device_attribute *attr, 
 static ssize_t memory_read(struct device *dev, struct device_attribute *attr, char *buf) {
   fe_dma_dev_t * devp = (fe_dma_dev_t *)dev_get_drvdata(dev);
   char temp[4];
-  int i; 
+  //int i; 
   sprintf(buf," ");
   
-  for(i = 0; i < 256; i++){
-    devp->memory = ioread32((u32 *)devp->regs + devp->address + i);
+  //for(i = 0; i < 256; i++){
+    devp->memory = ioread32((u32 *)devp->regs + devp->address);
     sprintf(temp, "%u", devp->memory);
     strcat(buf, temp);
-    strcat(buf, " ");
-  }
+  //  strcat(buf, " ");
+  //}
   //sprintf(buf, "%u %u %u %u %u %u %u %u %u %u %u %u %u %u %u %u", devp->memory, devp->memory, devp->memory, devp->memory, devp->memory, devp->memory, devp->memory, devp->memory, devp->memory, devp->memory, devp->memory, devp->memory, devp->memory, devp->memory, devp->memory, devp->memory);
   //devp->address = devp->address + 1;
   return strlen(buf);

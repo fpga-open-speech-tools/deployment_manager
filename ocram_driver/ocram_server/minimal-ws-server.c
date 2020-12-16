@@ -32,7 +32,7 @@ static const lws_retry_bo_t retry = {
 	.secs_since_valid_hangup = 10,
 };
 
-static int interrupted;
+int interrupted;
 
 static const struct lws_http_mount mount = {
 	/* .mount_next */		NULL,		/* linked-list "next" */
