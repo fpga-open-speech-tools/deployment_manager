@@ -7,6 +7,7 @@ const ModelDataClient = require('./ModelDataClient.js');
 const path = require('path');
 const fs = require('fs');
 const { deflateSync } = require('zlib');
+const { defaultMaxListeners } = require('stream');
 
 const CONFIG_FILE = path.join(__dirname, 'config.json');
 
@@ -31,6 +32,10 @@ exports.setConfiguration = function (newConfig) {
 
 exports.getData = function () {
     return modelConfig.data;
+}
+
+exports.getReferenceByName = (name) => {
+    return modelConfig.data.findIndex(datum => datum.name == name);
 }
 
 exports.setModelConfig = function (newModelConfig){

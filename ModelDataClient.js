@@ -1,6 +1,8 @@
 'use strict';
 const signalR = require("@microsoft/signalr");
-
+const WebSocket = require('ws');
+const url = require('url');
+const ModelController = require('./ModelController');
 
 class ModelDataClient {
     constructor(url, connected, callback) {
@@ -48,6 +50,21 @@ class ModelDataClient {
             // console.log('closed');
             this.connected = false;
         });
+    }
+    addDataSource(req, res) {
+        const query = url.parse(req.url, true).query;
+        if(query.port && query.name){
+            this.ws = new WebSocket(`ws://localhost:${query.port}`);
+            this.ws.on('message', function incoming(data) {
+                const name = query.name;
+                let dataPacket = {}
+                dataPacket.ref = ModelController.getReferenceByName(name);
+                dataPacket.value = data;
+                this.connection.invoke("SendDataPacket", dataPacket).catch(function (err) {
+                    return console.error(err.toString());
+                });
+              });
+        }
     }
 }
 

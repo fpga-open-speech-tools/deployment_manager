@@ -205,3 +205,7 @@ exports.invalidRequest = function (req, res) {
     res.setHeader('Content-Type', 'text/plain');
     res.end('Invalid Request');
 };
+
+exports.addDataSource = (req, res) => {
+    ModelDataClient.addDataSource(req, res);
+}

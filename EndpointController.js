@@ -26,6 +26,9 @@ module.exports = http.createServer((request, result) => {
     else if(reqUrl.pathname == '/connect-rtc' && request.method === 'GET') {
         service.connectSignalR(request, result);
     }
+    else if(reqUrl.pathname == '/data-source' && request.method === 'POST') {
+        service.addDataSource(request, result)
+    }
     else {
         service.invalidRequest(request, result);
     }
