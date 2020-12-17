@@ -207,5 +207,5 @@ exports.invalidRequest = function (req, res) {
 };
 
 exports.addDataSource = (req, res) => {
-    ModelDataClient.addDataSource(req, res);
+    modelDataClient.addDataSource(req, res);
 }
