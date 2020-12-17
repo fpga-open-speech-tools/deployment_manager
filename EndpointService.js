@@ -208,4 +208,6 @@ exports.invalidRequest = function (req, res) {
 
 exports.addDataSource = (req, res) => {
     modelDataClient.addDataSource(req, res);
+    res.statusCode = 200;
+    res.end();
 }
