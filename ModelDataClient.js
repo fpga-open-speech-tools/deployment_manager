@@ -53,7 +53,9 @@ class ModelDataClient {
     }
     addDataSource(req, res) {
         const query = url.parse(req.url, true).query;
+        console.log("Connection attempt received")
         if(query.port && query.name){
+            console.log(`Attempting to connect to ws://localhost:${query.port}`)
             this.ws = new WebSocket(`ws://localhost:${query.port}`);
             this.ws.on('message', function incoming(data) {
                 const name = query.name;
