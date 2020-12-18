@@ -66,10 +66,10 @@ class ModelDataClient {
                 //console.log(dataPacket.ref)
                 dataPacket.value = data.data;
                 //console.log(data.data);
-                this.sendObject(dataPacket);
-                // this.connection.invoke("SendDataPacket", dataPacket).catch(function (err) {
-                //     return console.error(err.toString());
-                // });
+                // this.sendObject(dataPacket);
+                this.connection.invoke("SendDataPacket", dataPacket).catch(function (err) {
+                    return console.error(err.toString());
+                });
               };
               this.ws.onmessage = this.ws.onmessage.bind(this);
         }
