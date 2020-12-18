@@ -67,7 +67,7 @@ class ModelDataClient {
                 dataPacket.value = data.data;
                 //console.log(data.data);
                 // this.sendObject(dataPacket);
-                this.connection.invoke("SendDataPacket", dataPacket).catch(function (err) {
+                this.connection.invoke("SendDataPacket", [dataPacket]).catch(function (err) {
                     return console.error(err.toString());
                 });
               };
