@@ -1,6 +1,6 @@
 'use strict';
 const signalR = require("@microsoft/signalr");
-const WebSocket = require('ws');
+const W3CWebSocket = require('websocket').w3cwebsocket;
 const url = require('url');
 const ModelController = require('./ModelController');
 
@@ -55,9 +55,10 @@ class ModelDataClient {
         const query = url.parse(req.url, true).query;
         console.log("Connection attempt received")
         if(query.port && query.name){
-            console.log(`Attempting to connect to ws://localhost:${query.port}`)
-            this.ws = new WebSocket(`ws://localhost:${query.port}`);
-            this.ws.on('message', function incoming(data) {
+            let connectionString = `ws://localhost:${query.port}/`
+            console.log(`Attempting to connect to ${connectionString}`)
+            this.ws = new W3CWebSocket(connectionString, 'lws-minimal');
+            this.ws.onmessage = function incoming(data) {
                 const name = query.name;
                 let dataPacket = {}
                 dataPacket.ref = ModelController.getReferenceByName(name);
@@ -66,7 +67,7 @@ class ModelDataClient {
                 this.connection.invoke("SendDataPacket", dataPacket).catch(function (err) {
                     return console.error(err.toString());
                 });
-              });
+              };
         }
     }
 }
