@@ -62,8 +62,8 @@ class ModelDataClient {
                 const name = query.name;
                 let dataPacket = {}
                 dataPacket.ref = ModelController.getReferenceByName(name);
-                dataPacket.value = data;
-                console.log(data);
+                dataPacket.value = data.data;
+                console.log(data.data);
                 this.connection.invoke("SendDataPacket", dataPacket).catch(function (err) {
                     return console.error(err.toString());
                 });
