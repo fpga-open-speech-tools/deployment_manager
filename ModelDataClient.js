@@ -68,6 +68,7 @@ class ModelDataClient {
                     return console.error(err.toString());
                 });
               };
+            this.ws.onmessage.bind(this);
         }
     }
 }
