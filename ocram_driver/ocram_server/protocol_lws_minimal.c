@@ -68,6 +68,8 @@ __minimal_destroy_message(void *_msg)
 
 struct per_vhost_data__minimal *g_vhd;
 
+extern int active;
+
 static int
 callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 			void *user, void *in, size_t len)
@@ -83,6 +85,7 @@ callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
 	switch (reason) {
 	case LWS_CALLBACK_PROTOCOL_INIT:
+		printf("Hello1\n");
 		vhd = lws_protocol_vh_priv_zalloc(lws_get_vhost(wsi),
 				lws_get_protocol(wsi),
 				sizeof(struct per_vhost_data__minimal));
@@ -92,19 +95,24 @@ callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 		break;
 
 	case LWS_CALLBACK_ESTABLISHED:
+		printf("Hello2\n");
 		/* add ourselves to the list of live pss held in the vhd */
 		lws_ll_fwd_insert(pss, pss_list, vhd->pss_list);
 		pss->wsi = wsi;
 		pss->last = vhd->current;
+		active = 1;
+		printf("Connection made\n");
 		break;
 
 	case LWS_CALLBACK_CLOSED:
+		printf("Hello3\n");
 		/* remove our closing pss from the list of live pss */
 		lws_ll_fwd_remove(struct per_session_data__minimal, pss_list,
 				  pss, vhd->pss_list);
 		break;
 
 	case LWS_CALLBACK_SERVER_WRITEABLE:
+		printf("Hello4\n");
 		if (!vhd->amsg.payload)
 			break;
 
@@ -123,10 +131,12 @@ callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 		break;
 
 	case LWS_CALLBACK_RECEIVE:
+		printf("Hello5\n");
 		(receive_pointer_function)((message_type)in,len);
 		break;
 
 	default:
+		printf("Hello6\n");
 		break;
 	}
 
@@ -135,29 +145,31 @@ callback_minimal(struct lws *wsi, enum lws_callback_reasons reason,
 
 void 
 send_message_all_clients(char* message, uint length)
-{
-		if (g_vhd->amsg.payload)
-			__minimal_destroy_message(&g_vhd->amsg);
+{			
+	if (g_vhd->amsg.payload)
+		__minimal_destroy_message(&g_vhd->amsg);
 
-		g_vhd->amsg.len = length;
-		/* notice we over-allocate by LWS_PRE */
-		g_vhd->amsg.payload = malloc(LWS_PRE + length);
-		if (!g_vhd->amsg.payload) {
-			lwsl_user("OOM: dropping\n");
-			return;
-		}
-
-		memcpy((char *)g_vhd->amsg.payload + LWS_PRE, message, length);
-		g_vhd->current++;
-
-		/*
-		 * let everybody know we want to write something on them
-		 * as soon as they are ready
-		 */
-		lws_start_foreach_llp(struct per_session_data__minimal **,
-				      ppss, g_vhd->pss_list) {
-			lws_callback_on_writable((*ppss)->wsi);
-		} lws_end_foreach_llp(ppss, pss_list);
+	g_vhd->amsg.len = length;
+	/* notice we over-allocate by LWS_PRE */
+	g_vhd->amsg.payload = malloc(LWS_PRE + length);
+	
+	if (!g_vhd->amsg.payload) {
+		lwsl_user("OOM: dropping\n");
+		return;
+	}
+	
+	memcpy((char *)g_vhd->amsg.payload + LWS_PRE, message, length);
+	g_vhd->current++;
+	
+	/*
+		* let everybody know we want to write something on them
+		* as soon as they are ready
+		*/
+	lws_start_foreach_llp(struct per_session_data__minimal **,
+					ppss, g_vhd->pss_list) {
+		lws_callback_on_writable((*ppss)->wsi);
+	} lws_end_foreach_llp(ppss, pss_list);
+	
 }
 
 

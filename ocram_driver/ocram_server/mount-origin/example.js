@@ -21,7 +21,7 @@ function get_appropriate_ws_url(extra_url)
 	u = u.split("/");
 
 	/* + "/xxx" bit is for IE10 workaround */
-
+	console.log(pcol + u[0] + "/" + extra_url)
 	return pcol + u[0] + "/" + extra_url;
 }
 
