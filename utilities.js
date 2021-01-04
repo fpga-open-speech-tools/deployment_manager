@@ -127,6 +127,9 @@ let createData = (device, reg, index) => {
         value: reg.defaultValue,
         properties
     }
+    if(reg.connection){
+        uiReg.connection = reg.connection
+    }
     return [uiReg, option]
 }
 

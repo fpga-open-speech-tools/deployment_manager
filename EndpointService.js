@@ -6,6 +6,7 @@ const fs = require('fs');
 const ModelController = require('./ModelController.js');
 const ModelDataClient = require('./ModelDataClient.js');
 const dpram = require('./dpram')
+const { spawn } = require("child_process");
 
 const configPath = "../config"
 
@@ -86,10 +87,22 @@ exports.setDownloadRequest = function (req, res) {
                     if(fs.existsSync('../config/model.json')){
                         let ui = util.convertModelJsonToUIJson('../config/model.json')
                         let model = util.loadJsonFile('../config/model.json')
-                        console.log(ui)
+                        
                         if(dpram.hasDPRAM(model)){
                             dpram.parse(model, ui)
                         }
+
+                        ui.data.forEach((datum, index) => {
+                            if(datum.connection){
+                                if(datum.connection.type == "ws"){
+                                    if(datum.connection.file){
+                                        spawn('../config/' + datum.connection.file, [], { stdio: 'ignore' })
+                                    }
+                                    ModelDataClient.addDataSource(datum.connection.port, index);
+                                }
+                            }
+                        });
+
                         ModelController.setModelConfig(ui)
                     }
                     else {
@@ -207,7 +220,9 @@ exports.invalidRequest = function (req, res) {
 };
 
 exports.addDataSource = (req, res) => {
-    modelDataClient.addDataSource(req, res);
+    const query = url.parse(req.url, true).query;
+    let dataIndex = ModelController.getReferenceByName(query.name);
+    modelDataClient.addDataSource(query.port, dataIndex);
     res.statusCode = 200;
     res.end();
 }

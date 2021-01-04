@@ -51,28 +51,21 @@ class ModelDataClient {
             this.connected = false;
         });
     }
-    addDataSource(req, res) {
-        const query = url.parse(req.url, true).query;
-        console.log("Connection attempt received")
-        if(query.port && query.name){
-            let connectionString = `ws://localhost:${query.port}/`
-            console.log(`Attempting to connect to ${connectionString}`)
-            this.ws = new W3CWebSocket(connectionString, 'lws-minimal');
-            this.ws.onmessage = function incoming(data) {
-                const name = query.name;
-                let dataPacket = {}
-                //console.log(name)
-                dataPacket.index = ModelController.getReferenceByName(name);
-                //console.log(dataPacket.ref)
-                dataPacket.value = data.data;
-                //console.log(data.data);
-                // this.sendObject(dataPacket);
-                this.connection.invoke("SendDataPacket", [dataPacket]).catch(function (err) {
-                    return console.error(err.toString());
-                });
-              };
-              this.ws.onmessage = this.ws.onmessage.bind(this);
-        }
+    addDataSource(port, dataIndex) {
+        
+        let connectionString = `ws://localhost:${port}/`
+        console.log(`Attempting to connect to ${connectionString}`)
+        this.ws = new W3CWebSocket(connectionString, 'lws-minimal');
+        this.ws.onmessage = function incoming(data) {
+            
+            let dataPacket = {}
+            dataPacket.index = dataIndex
+            dataPacket.value = data.data;
+            this.connection.invoke("SendDataPacket", [dataPacket]).catch(function (err) {
+                return console.error(err.toString());
+            });
+            };
+        this.ws.onmessage = this.ws.onmessage.bind(this);
     }
 }
 
