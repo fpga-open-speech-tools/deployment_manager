@@ -51,8 +51,7 @@ class ModelDataClient {
             this.connected = false;
         });
     }
-    addDataSource(port, dataIndex) {
-        
+    _addDataSource(port, dataIndex) {
         let connectionString = `ws://localhost:${port}/`
         console.log(`Attempting to connect to ${connectionString}`)
         this.ws = new W3CWebSocket(connectionString, 'lws-minimal');
@@ -76,6 +75,10 @@ class ModelDataClient {
             });
             };
         this.ws.onmessage = this.ws.onmessage.bind(this);
+    }
+    addDataSource(port, dataIndex) {
+        setTimeout(this._addDataSource, 3000, port, dataIndex)
+        
     }
 }
 
