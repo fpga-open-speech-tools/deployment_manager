@@ -78,7 +78,7 @@ class ModelDataClient {
         this.ws.onmessage = this.ws.onmessage.bind(this);
     }
     addDataSource(port, dataIndex) {
-        setTimeout(this._addDataSource, 3000, port, dataIndex);
+        setTimeout(this._addDataSource.bind(this), 3000, port, dataIndex);
     }
 }
 

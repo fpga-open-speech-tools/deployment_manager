@@ -83,6 +83,7 @@ void* persistentReadRAM(){
       *readNow = 0;
       len = readRAM(n++, f, readLen);
       
+      printf("Th3 buffer is %s\n",  f);
       
       if(active) {
         // 

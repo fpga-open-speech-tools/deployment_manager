@@ -104,6 +104,7 @@ exports.setDownloadRequest = function (req, res) {
                                         cp.stdout.on('data', (data) => {
                                             console.log(`stdout: ${data}`);
                                         });
+                                        cp.on('close', () => console.log("Process closed"));
                                     }
                                     modelDataClient.addDataSource(datum.connection.port, index);
                                 }
