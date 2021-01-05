@@ -85,6 +85,12 @@ exports.setDownloadRequest = function (req, res) {
             downloadPromise.then((result) => {
                 let status = "success"
                 res.statusCode = 200;
+
+                if(cp != null){
+                    cp.kill(9);
+                    cp = null;
+                }
+
                 if (!fs.existsSync('../config/ui.json') ) {
                     if(fs.existsSync('../config/model.json')){
                         let ui = util.convertModelJsonToUIJson('../config/model.json')
@@ -104,7 +110,10 @@ exports.setDownloadRequest = function (req, res) {
                                         cp.stdout.on('data', (data) => {
                                             console.log(`stdout: ${data}`);
                                         });
-                                        cp.on('close', () => console.log("Process closed"));
+                                        cp.on('close', () => {
+                                            console.log("Process closed");
+                                            cp = null; 
+                                        });
                                     }
                                     modelDataClient.addDataSource(datum.connection.port, index);
                                 }
