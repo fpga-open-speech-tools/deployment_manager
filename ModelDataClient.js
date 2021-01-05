@@ -61,6 +61,7 @@ class ModelDataClient {
             let dataPacket = {}
             dataPacket.index = dataIndex
             dataPacket.value = data.data;
+            console.log(dataPacket)
             this.connection.invoke("SendDataPacket", [dataPacket]).catch(function (err) {
                 return console.error(err.toString());
             });
