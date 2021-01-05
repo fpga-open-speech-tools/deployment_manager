@@ -81,7 +81,6 @@ exports.setDownloadRequest = function (req, res) {
             }
 
             if(cp != null){
-                modelDataClient.
                 cp.kill(9);
                 cp = null;
             }
