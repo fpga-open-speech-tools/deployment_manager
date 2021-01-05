@@ -57,6 +57,7 @@ class ModelDataClient {
         this.ws = new W3CWebSocket(connectionString, 'lws-minimal');
         this.ws.onopen = function () {
             console.log("WS connection successful");
+            console.log(`port number is: ${port}`)
         }
         this.ws.onerror = function () {
             console.log("WS connection error");
@@ -77,8 +78,7 @@ class ModelDataClient {
         this.ws.onmessage = this.ws.onmessage.bind(this);
     }
     addDataSource(port, dataIndex) {
-        setTimeout(this._addDataSource, 3000, port, dataIndex)
-        
+        setTimeout(this._addDataSource, 3000, port, dataIndex);
     }
 }
 
