@@ -85,9 +85,11 @@ exports.setDownloadRequest = function (req, res) {
             downloadPromise.then((result) => {
                 let status = "success"
                 res.statusCode = 200;
+                let waiting = true;
 
                 if(cp != null){
                     cp.kill(9);
+                    while(waiting);
                     cp = null;
                 }
 
@@ -113,6 +115,7 @@ exports.setDownloadRequest = function (req, res) {
                                         cp.on('close', () => {
                                             console.log("Process closed");
                                             cp = null; 
+                                            waiting = false;
                                         });
                                     }
                                     modelDataClient.addDataSource(datum.connection.port, index);
