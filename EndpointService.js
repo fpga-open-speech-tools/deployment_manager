@@ -100,7 +100,7 @@ exports.setDownloadRequest = function (req, res) {
                                         fs.chmodSync(driverpath, '0775')
                                         spawn(driverpath, [], { stdio: 'ignore' })
                                     }
-                                    ModelDataClient.addDataSource(datum.connection.port, index);
+                                    modelDataClient.addDataSource(datum.connection.port, index);
                                 }
                             }
                         });
