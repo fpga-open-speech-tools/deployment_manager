@@ -81,6 +81,7 @@ exports.setDownloadRequest = function (req, res) {
             }
 
             if(cp != null){
+                modelDataClient.removeDataSource();
                 cp.kill(9);
                 cp = null;
             }
