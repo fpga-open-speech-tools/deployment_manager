@@ -12,6 +12,8 @@ const configPath = "../config"
 
 var previousProjectName; 
 
+var cp;
+
 var registerPaths = {};
 
 var CommandObject;
@@ -98,7 +100,7 @@ exports.setDownloadRequest = function (req, res) {
                                     if(datum.connection.file){
                                         let driverpath = '../config/' + datum.connection.file;
                                         fs.chmodSync(driverpath, '0775')
-                                        var cp = spawn(driverpath, [], { stdio: 'ignore' })
+                                        cp = spawn(driverpath, [])
                                         cp.stdout.on('data', (data) => {
                                             console.log(`stdout: ${data}`);
                                         });
