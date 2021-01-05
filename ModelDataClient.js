@@ -56,6 +56,9 @@ class ModelDataClient {
         let connectionString = `ws://localhost:${port}/`
         console.log(`Attempting to connect to ${connectionString}`)
         this.ws = new W3CWebSocket(connectionString, 'lws-minimal');
+        this.ws.onconnect = function () {
+            console.log("WS connection successful");
+        }
         this.ws.onmessage = function incoming(data) {
             
             let dataPacket = {}
