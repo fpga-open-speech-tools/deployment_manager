@@ -97,7 +97,7 @@ exports.setDownloadRequest = function (req, res) {
                                 if(datum.connection.type == "ws"){
                                     if(datum.connection.file){
                                         let driverpath = '../config/' + datum.connection.file;
-                                        fs.chmodSync(driverpath, '0o775')
+                                        fs.chmodSync(driverpath, '0775')
                                         spawn(driverpath, [], { stdio: 'ignore' })
                                     }
                                     ModelDataClient.addDataSource(datum.connection.port, index);
