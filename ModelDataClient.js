@@ -80,6 +80,9 @@ class ModelDataClient {
     addDataSource(port, dataIndex) {
         setTimeout(this._addDataSource.bind(this), 3000, port, dataIndex);
     }
+    removeDataSource(){
+        this.ws.close();
+    }
 }
 
 module.exports = ModelDataClient

@@ -80,18 +80,19 @@ exports.setDownloadRequest = function (req, res) {
                 overlayManager.remove(previousProjectName);
             }
 
+            if(cp != null){
+                modelDataClient.
+                cp.kill(9);
+                cp = null;
+            }
+
             var downloadPromise = overlayManager.downloadAndInstall(CommandObject.bucketname, CommandObject.downloadurl, configPath);
 
             downloadPromise.then((result) => {
                 let status = "success"
                 res.statusCode = 200;
-                let waiting = true;
 
-                if(cp != null){
-                    cp.kill(9);
-                    while(waiting);
-                    cp = null;
-                }
+                
 
                 if (!fs.existsSync('../config/ui.json') ) {
                     if(fs.existsSync('../config/model.json')){
@@ -115,7 +116,6 @@ exports.setDownloadRequest = function (req, res) {
                                         cp.on('close', () => {
                                             console.log("Process closed");
                                             cp = null; 
-                                            waiting = false;
                                         });
                                     }
                                     modelDataClient.addDataSource(datum.connection.port, index);
