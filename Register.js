@@ -30,6 +30,7 @@ function findMajorNumber (moduleName) {
     }
 };
 
+
 exports.write = function(device, name ,value) {
     return new Promise((resolve, reject) => {
         // console.log(device, name, value);
@@ -40,16 +41,25 @@ exports.write = function(device, name ,value) {
             // construct the path the to register file
             // XXX: this will likely change once we finish designing our configuration file format
             // XXX: we really shouldn't construct the path every time we do a write; suboptimal performance
-            const majorNumber = findMajorNumber(device);
-            const devicePath = createDevicePath(device, majorNumber);
-            const registerPath = devicePath + "/" + name;
+            let minorNumber = 0;
+            
+            
+            let devicePath = `/sys/class/${device}/${device}${minorNumber}`;
+            let registerPath = devicePath + "/" + name;
 
             // console.log(registerPath);
 
             fs.writeFile(registerPath, value, (err) => {
                 if (err) 
                 {
-                    throw err;
+                    if(err.code === 'ENOENT') {
+                        const majorNumber = findMajorNumber(device);
+                        devicePath = createDevicePath(device, majorNumber);
+                        registerPath = devicePath + "/" + name;
+                        fs.writeFile(registerPath, value, (err) => {
+
+                        });
+                    }
                 }
             });
             
