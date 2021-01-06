@@ -75,6 +75,11 @@ exports.convertModelJsonToUIJson = function(filepath) {
             }
 
             let [viewType, viewVariant] = getViewType(uiReg)
+            let viewOption = getViewOption(reg, viewType, viewVariant)
+            if(viewOption){
+                optionsLength = ui.options.push(viewOption)
+                options = options.push(optionsLength - 1)
+            }
             let view = createView(uiReg.name, viewType, viewVariant, [dataIndex], options)
             addViewToContainer(ui, view, device.name)
 
@@ -161,7 +166,22 @@ let getMinMaxStep = function(reg) {
     return {min: min, max: max, step: step}
 }
 
+let getViewOption = (modelReg, viewType, viewVariant) => {
+    if(viewType == "Graph"){
+        return {
+            config: {
+                feed: "time",
+                maxValues: 100
+            }
+        }
+    }
+    return null
+}
+
 let getViewType = (input) => {
+    if(reg.direction && reg.direction == "out"){
+        return ["Graph", "line"]
+    }
     if(Array.isArray(input) && input.length == 2)
         return ["TwoHandleSlider", "standard"]
     if(input.min == 0 && input.max == 1 && input.step == 1 || (input.properties && input.properties.enumeration))
@@ -206,3 +226,4 @@ let addViewToContainer = (ui, view, containerName) => {
 exports.addViewToContainer = addViewToContainer;
 exports.createView = createView;
 exports.getViewType = getViewType;
+exports.getViewOption = getViewOption;
