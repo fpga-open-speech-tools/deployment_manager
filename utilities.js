@@ -78,7 +78,7 @@ exports.convertModelJsonToUIJson = function(filepath) {
             let viewOption = getViewOption(reg, viewType, viewVariant)
             if(viewOption){
                 optionsLength = ui.options.push(viewOption)
-                options = options.push(optionsLength - 1)
+                options.push(optionsLength - 1)
             }
             let view = createView(uiReg.name, viewType, viewVariant, [dataIndex], options)
             addViewToContainer(ui, view, device.name)
@@ -182,7 +182,6 @@ let getViewOption = (modelReg, viewType, viewVariant) => {
 }
 
 let getViewType = (input) => {
-    console.log(input)
     if(input.direction && input.direction == "out"){
         return ["Graph", "line"]
     }
