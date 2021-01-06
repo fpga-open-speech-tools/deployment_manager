@@ -135,6 +135,9 @@ let createData = (device, reg, index) => {
     if(reg.connection){
         uiReg.connection = reg.connection
     }
+    if(reg.direction){
+        uiReg.direction = reg.direction
+    }
     return [uiReg, option]
 }
 
@@ -179,6 +182,7 @@ let getViewOption = (modelReg, viewType, viewVariant) => {
 }
 
 let getViewType = (input) => {
+    console.log(input)
     if(input.direction && input.direction == "out"){
         return ["Graph", "line"]
     }
