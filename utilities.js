@@ -179,7 +179,7 @@ let getViewOption = (modelReg, viewType, viewVariant) => {
 }
 
 let getViewType = (input) => {
-    if(reg.direction && reg.direction == "out"){
+    if(input.direction && input.direction == "out"){
         return ["Graph", "line"]
     }
     if(Array.isArray(input) && input.length == 2)
