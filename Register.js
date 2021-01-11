@@ -26,6 +26,7 @@ function findMajorNumber (moduleName) {
     } catch (error) {
         // the most likely error to occur is that the desired directory doesn't 
         // exist because the driver hasn't been loaded yet; this is no big deal
+        console.log("Find Major Number failed")
         console.log(error.toString());
     }
 };
@@ -47,11 +48,12 @@ exports.write = function(device, name ,value) {
             let devicePath = `/sys/class/${device}/${device}${minorNumber}`;
             let registerPath = devicePath + "/" + name;
 
-            // console.log(registerPath);
+            console.log(registerPath);
 
             fs.writeFile(registerPath, value, (err) => {
                 if (err) 
-                {
+                {   
+                    console.log("An error occurred")
                     if(err.code === 'ENOENT') {
                         const majorNumber = findMajorNumber(device);
                         devicePath = createDevicePath(device, majorNumber);
