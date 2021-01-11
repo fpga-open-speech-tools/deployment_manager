@@ -78,6 +78,10 @@ exports.setData = function(dataPackets) {
                         console.error(rejectedResult);
                     });
                 }
+                else if(datum.type === "user-only"){
+                    resolve({})
+                    return;
+                }
                 else {
                     errors.push(`data type ${datum.type} is not supported`);
                 }
