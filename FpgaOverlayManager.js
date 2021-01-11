@@ -34,6 +34,7 @@ exports.downloadAndInstall = function(s3bucket, s3dir, configPath) {
                     resolve({code});
                 }
                 else {
+                    console.log("downloadProc failed")
                     reject({code});
                 }
             }

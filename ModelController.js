@@ -89,6 +89,7 @@ exports.setData = function(dataPackets) {
         }
 
         if (errors && errors.length) {
+            console.log("set data failed")
             reject({errors});
         }
         else {
