@@ -48,18 +48,18 @@ exports.write = function(device, name ,value) {
             let devicePath = `/sys/class/fe_${device}/fe_${device}${minorNumber}`;
             let registerPath = devicePath + "/" + name;
 
-            console.log(registerPath);
-
             fs.writeFile(registerPath, value, (err) => {
                 if (err) 
                 {   
-                    console.log("An error occurred")
+                    console.log("Attempting to write to driver at legacy location")
                     if(err.code === 'ENOENT') {
                         const majorNumber = findMajorNumber(device);
                         devicePath = createDevicePath(device, majorNumber);
                         registerPath = devicePath + "/" + name;
                         fs.writeFile(registerPath, value, (err) => {
-
+                            if(err){
+                                console.log(`Error: Device driver file not found: ${registerPath}`)
+                            }
                         });
                     }
                 }
