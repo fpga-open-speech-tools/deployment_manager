@@ -45,7 +45,7 @@ exports.write = function(device, name ,value) {
             let minorNumber = 0;
             
             
-            let devicePath = `/sys/class/fe_${device}/${device}${minorNumber}`;
+            let devicePath = `/sys/class/fe_${device}/fe_${device}${minorNumber}`;
             let registerPath = devicePath + "/" + name;
 
             console.log(registerPath);
