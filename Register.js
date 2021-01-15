@@ -44,8 +44,7 @@ exports.write = function(device, name ,value) {
             // XXX: we really shouldn't construct the path every time we do a write; suboptimal performance
             let minorNumber = 0;
             
-            
-            let devicePath = `/sys/class/fe_${device}/fe_${device}${minorNumber}`;
+            let devicePath = `/sys/class/al_${device}/al_${device}${minorNumber}`;
             let registerPath = devicePath + "/" + name;
 
             fs.writeFile(registerPath, value, (err) => {
@@ -58,7 +57,7 @@ exports.write = function(device, name ,value) {
                         registerPath = devicePath + "/" + name;
                         fs.writeFile(registerPath, value, (err) => {
                             if(err){
-                                console.log(`Error: Device driver file not found: ${registerPath}`)
+                                console.log(`Error: Device driver file not found.`)
                             }
                         });
                     }
