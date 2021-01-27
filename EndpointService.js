@@ -100,7 +100,7 @@ exports.setDownloadRequest = function (req, res) {
                         let model = util.loadJsonFile('../config/model.json')
                         
                         if(dpram.hasDPRAM(model)){
-                            dpram.parse(model, ui)
+                            dpram.parse(model, ui, "../config/")
                         }
 
                         ui.data.forEach((datum, index) => {

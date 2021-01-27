@@ -1,0 +1,124 @@
+{
+    "inputs": [
+        [{
+            "name": "db Min",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "value": 50
+        },
+        {
+            "name": "db Max",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "value": 96
+        }]
+    ],
+    "groups": [
+        "0-250 (Hz)",
+        "250-500 (Hz)",
+        "500-750 (Hz)",
+        "750-1k (Hz)",
+        "1k-2k (Hz)",
+        "2k-4k (Hz)",
+        "4k-12k (Hz)",
+        "12k-24k (Hz)"
+    ],
+    "processing": {
+        "initFunctions": [
+            {"output_name":"table_1","function":"create_gain_table(gain_table_size,gain_table_spacing)"},
+            {"output_name":"table_gains","function":"[]"},
+            {"output_name":"table_gains_scaled","function":"[]"}
+        ],
+        "groupFunctions": [
+            {"output_name":"table_min_adjust","function":"set_table_min(table_1,band_${index}_min + minimum_boost_value)"},
+            {"output_name":"table_max_adjust","function":"set_table_max(table_min_adjust,band_${index}_max)"},
+            {"output_name":"table_gains[${index}]","function":"get_table_gains(table_max_adjust,table_1)"},
+            {"output_name":"table_gains_scaled[${index}]", "function":"print_table(dotPow(10,dotDivide(table_gains[${index}],10)))"}
+
+        ],
+        "endFunctions": [
+            {"output_name":"processOutput", "function":"table_gains_scaled.join(' ')"}
+        ],
+        "inputs": [
+            {
+                "name":"band_${index}_min",
+                "type":"pointer",
+                "value":[0,0]
+            },
+            {
+                "name":"band_${index}_max",
+                "type":"pointer",
+                "value":[0,1]
+            },
+            {
+                "name":"fs",
+                "type":"constant",
+                "value":48000
+            },
+            {
+            
+                "name": "minimum_boost_value",
+                "type": "constant",
+                "value": 6
+            },
+            {
+                "name":"gain_table_size",
+                "type":"constant",
+                "value":32
+            },
+            {
+                "name":"gain_table_spacing",
+                "type":"constant",
+                "value":3
+            },
+            {
+                "name":"create_gain_table",
+                "type":"function",
+                "value": {
+                    "parameters":["size","spacing"],
+                    "type":"javascript",
+                    "output": "let output = []; for(var i=0; i<size;i++){output[i]=i*spacing;} return output;"
+                }
+            },
+            {
+                "name":"print_table",
+                "type":"function",
+                "value": {
+                    "parameters":["table"],
+                    "type":"javascript",
+                    "output": "let output = ''; table.forEach((val) => {output += val + ' ';}); return output;"
+                }
+            },
+            {
+                "name":"set_table_min",
+                "type":"function",
+                "value":{
+                    "parameters":["table","min"],
+                    "type":"javascript",
+                    "output":"let newTable = []; table.forEach((val)=>{newTable.push(val);}); newTable.forEach((value,index)=>{if(newTable[index]<=min){newTable[index]=min;}});return newTable;"
+                }
+            },
+            {
+                "name":"set_table_max",
+                "type":"function",
+                "value":{
+                    "parameters":["table","max"],
+                    "type":"javascript",
+                    "output":"let newTable = []; table.forEach((val)=>{newTable.push(val);}); newTable.forEach((value,index)=>{if(newTable[index]>=max){newTable[index]=max;}});return newTable;"
+                }
+            },
+            {
+                "name":"get_table_gains",
+                "type":"function",
+                "value":{
+                    "parameters":["updated","original"],
+                    "type":"javascript",
+                    "output":"let newTable = []; updated.forEach((value,index)=>{newTable[index]=updated[index]-original[index];});return newTable;"
+                }
+            }
+        ],
+        "output": "%processOutput"
+    }
+}

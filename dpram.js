@@ -5,13 +5,13 @@ let addViewToContainer = utils.addViewToContainer,
     createView = utils.createView,
     getViewType = utils.getViewType;
 
-let parse = (model, ui) => {
+let parse = (model, ui, configPath) => {
     model.devices.forEach(device =>{
         let dprams = findDPRAM(device);
         let config = {}
         dprams.forEach(dpram =>{
             let filename = dpram.name + ".json"
-            let filepath = "../config/" + filename;
+            let filepath = configPath + filename;
             if(fs.existsSync(filepath)){
                 config = utils.loadJsonFile(filepath)
             }
