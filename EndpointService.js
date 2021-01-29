@@ -93,10 +93,10 @@ exports.setDownloadRequest = function (req, res) {
                 res.statusCode = 200;
 
                 
-
+                let ui = {};
                 if (!fs.existsSync('../config/ui.json') ) {
                     if(fs.existsSync('../config/model.json')){
-                        let ui = util.convertModelJsonToUIJson('../config/model.json')
+                        ui = util.convertModelJsonToUIJson('../config/model.json')
                         let model = util.loadJsonFile('../config/model.json')
                         
                         if(dpram.hasDPRAM(model)){
@@ -114,7 +114,7 @@ exports.setDownloadRequest = function (req, res) {
                     }
                 }
                 else {
-                    let ui = util.loadJsonFile('../config/ui.json')
+                    ui = util.loadJsonFile('../config/ui.json')
                     ModelController.setModelConfig(ui);
                 }
 
