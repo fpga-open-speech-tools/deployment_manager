@@ -86,10 +86,13 @@ exports.setDownloadRequest = function (req, res) {
                 cp = null;
             }
 
-            try{
-                fs.unlink('../config/ui.json')
-            }
-            catch{}
+            fs.unlink('../config/ui.json', (err) => {
+                if (err) {
+                    console.error(err)
+                    return
+                }
+            })
+
 
             var downloadPromise = overlayManager.downloadAndInstall(CommandObject.bucketname, CommandObject.downloadurl, configPath);
 
