@@ -102,34 +102,42 @@ exports.setDownloadRequest = function (req, res) {
                         if(dpram.hasDPRAM(model)){
                             dpram.parse(model, ui, "../config/")
                         }
+                        
+                        ModelController.setModelConfig(ui);
 
-                        ui.data.forEach((datum, index) => {
-                            if(datum.connection){
-                                if(datum.connection.type == "ws"){
-                                    if(datum.connection.file){
-                                        let driverpath = '../config/' + datum.connection.file;
-                                        fs.chmodSync(driverpath, '0775')
-                                        cp = spawn(driverpath, [])
-                                        cp.stdout.on('data', (data) => {
-                                            console.log(`stdout: ${data}`);
-                                        });
-                                        cp.on('close', () => {
-                                            console.log("Process closed");
-                                            cp = null; 
-                                        });
-                                    }
-                                    modelDataClient.addDataSource(datum.connection.port, index);
-                                }
-                            }
-                        });
+                        
 
-                        ModelController.setModelConfig(ui)
                     }
                     else {
                         status = "no configuation";
                         res.statusCode = 400
                     }
                 }
+                else {
+                    let ui = util.loadJsonFile('../config/ui.json')
+                    ModelController.setModelConfig(ui);
+                }
+
+                ui.data.forEach((datum, index) => {
+                    if(datum.connection){
+                        if(datum.connection.type == "ws"){
+                            if(datum.connection.file){
+                                let driverpath = '../config/' + datum.connection.file;
+                                fs.chmodSync(driverpath, '0775')
+                                cp = spawn(driverpath, [])
+                                cp.stdout.on('data', (data) => {
+                                    console.log(`stdout: ${data}`);
+                                });
+                                cp.on('close', () => {
+                                    console.log("Process closed");
+                                    cp = null; 
+                                });
+                            }
+                            modelDataClient.addDataSource(datum.connection.port, index);
+                        }
+                    }
+                });
+
                 console.log(status)
                 // TODO: the FpgaOverlayManager should know about the previous project it loaded, so it can
                 //       handle removing overlays by itself. 
