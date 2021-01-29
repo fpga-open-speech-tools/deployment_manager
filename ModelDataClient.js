@@ -1,6 +1,8 @@
 'use strict';
 const signalR = require("@microsoft/signalr");
-
+const W3CWebSocket = require('websocket').w3cwebsocket;
+const url = require('url');
+const ModelController = require('./ModelController');
 
 class ModelDataClient {
     constructor(url, connected, callback) {
@@ -48,6 +50,38 @@ class ModelDataClient {
             // console.log('closed');
             this.connected = false;
         });
+    }
+    _addDataSource(port, dataIndex) {
+        let connectionString = `ws://localhost:${port}/`
+        console.log(`Attempting to connect to ${connectionString}`)
+        this.ws = new W3CWebSocket(connectionString, 'lws-minimal');
+        this.ws.onopen = function () {
+            console.log("WS connection successful");
+            console.log(`port number is: ${port}`)
+        }
+        this.ws.onerror = function () {
+            console.log("WS connection error");
+        }
+        this.ws.onclose = function () {
+            console.log("WS connection closed");
+        }
+        this.ws.onmessage = function incoming(data) {
+            
+            let dataPacket = {}
+            dataPacket.index = dataIndex
+            dataPacket.value = data.data;
+            console.log(dataPacket)
+            this.connection.invoke("SendDataPacket", [dataPacket]).catch(function (err) {
+                return console.error(err.toString());
+            });
+            };
+        this.ws.onmessage = this.ws.onmessage.bind(this);
+    }
+    addDataSource(port, dataIndex) {
+        setTimeout(this._addDataSource.bind(this), 3000, port, dataIndex);
+    }
+    removeDataSource(){
+        this.ws.close();
     }
 }
 

@@ -6,6 +6,8 @@ const Register = require('./Register.js');
 const ModelDataClient = require('./ModelDataClient.js');
 const path = require('path');
 const fs = require('fs');
+const { deflateSync } = require('zlib');
+const { defaultMaxListeners } = require('stream');
 
 const CONFIG_FILE = path.join(__dirname, 'config.json');
 
@@ -32,6 +34,10 @@ exports.getData = function () {
     return modelConfig.data;
 }
 
+exports.getReferenceByName = (name) => {
+    return modelConfig.data.findIndex(datum => datum.name == name);
+}
+
 exports.setModelConfig = function (newModelConfig){
     if(!newModelConfig.views){
         newModelConfig.views = []
@@ -55,7 +61,7 @@ exports.setData = function(dataPackets) {
                 // console.log(datum);
                 // console.log(modelConfig);
                 
-                if (datum.type === "register") {
+                if (datum.type === "register" || datum.type === "dpr") {
                     const dataWritePromise = Register.write(
                         datum.device, 
                         datum.name,
@@ -72,8 +78,12 @@ exports.setData = function(dataPackets) {
                         console.error(rejectedResult);
                     });
                 }
+                else if(datum.type === "user-only"){
+                    resolve({})
+                    return;
+                }
                 else {
-                    errors.append(`data type ${datum.type} is not supported`);
+                    errors.push(`data type ${datum.type} is not supported`);
                 }
 
             } 
@@ -83,6 +93,7 @@ exports.setData = function(dataPackets) {
         }
 
         if (errors && errors.length) {
+            console.log("set data failed")
             reject({errors});
         }
         else {

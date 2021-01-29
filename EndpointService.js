@@ -5,10 +5,14 @@ const overlayManager = require('./FpgaOverlayManager')
 const fs = require('fs');
 const ModelController = require('./ModelController.js');
 const ModelDataClient = require('./ModelDataClient.js');
+const dpram = require('./dpram')
+const { spawn } = require("child_process");
 
 const configPath = "../config"
 
 var previousProjectName; 
+
+var cp;
 
 var registerPaths = {};
 
@@ -76,14 +80,50 @@ exports.setDownloadRequest = function (req, res) {
                 overlayManager.remove(previousProjectName);
             }
 
+            if(cp != null){
+                modelDataClient.removeDataSource();
+                cp.kill(9);
+                cp = null;
+            }
+
             var downloadPromise = overlayManager.downloadAndInstall(CommandObject.bucketname, CommandObject.downloadurl, configPath);
 
             downloadPromise.then((result) => {
                 let status = "success"
                 res.statusCode = 200;
+
+                
+
                 if (!fs.existsSync('../config/ui.json') ) {
                     if(fs.existsSync('../config/model.json')){
-                        ModelController.setModelConfig(util.convertModelJsonToUIJson('../config/model.json'))
+                        let ui = util.convertModelJsonToUIJson('../config/model.json')
+                        let model = util.loadJsonFile('../config/model.json')
+                        
+                        if(dpram.hasDPRAM(model)){
+                            dpram.parse(model, ui, "../config/")
+                        }
+
+                        ui.data.forEach((datum, index) => {
+                            if(datum.connection){
+                                if(datum.connection.type == "ws"){
+                                    if(datum.connection.file){
+                                        let driverpath = '../config/' + datum.connection.file;
+                                        fs.chmodSync(driverpath, '0775')
+                                        cp = spawn(driverpath, [])
+                                        cp.stdout.on('data', (data) => {
+                                            console.log(`stdout: ${data}`);
+                                        });
+                                        cp.on('close', () => {
+                                            console.log("Process closed");
+                                            cp = null; 
+                                        });
+                                    }
+                                    modelDataClient.addDataSource(datum.connection.port, index);
+                                }
+                            }
+                        });
+
+                        ModelController.setModelConfig(ui)
                     }
                     else {
                         status = "no configuation";
@@ -198,3 +238,11 @@ exports.invalidRequest = function (req, res) {
     res.setHeader('Content-Type', 'text/plain');
     res.end('Invalid Request');
 };
+
+exports.addDataSource = (req, res) => {
+    const query = url.parse(req.url, true).query;
+    let dataIndex = ModelController.getReferenceByName(query.name);
+    modelDataClient.addDataSource(query.port, dataIndex);
+    res.statusCode = 200;
+    res.end();
+}
