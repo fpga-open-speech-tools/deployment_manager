@@ -86,6 +86,11 @@ exports.setDownloadRequest = function (req, res) {
                 cp = null;
             }
 
+            try{
+                fs.unlink('../config/ui.json')
+            }
+            catch{}
+
             var downloadPromise = overlayManager.downloadAndInstall(CommandObject.bucketname, CommandObject.downloadurl, configPath);
 
             downloadPromise.then((result) => {
@@ -105,13 +110,12 @@ exports.setDownloadRequest = function (req, res) {
                         
                         ModelController.setModelConfig(ui);
 
-                        
-
                     }
                     else {
                         status = "no configuation";
                         res.statusCode = 400
                     }
+                    console.log(ui)
                 }
                 else {
                     ui = util.loadJsonFile('../config/ui.json')
