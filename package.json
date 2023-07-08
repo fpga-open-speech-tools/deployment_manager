@@ -18,7 +18,7 @@
   "license": "MIT",
   "bugs": "https://github.com/fpga-open-speech-tools/control_server/issues",
   "dependencies": {
-    "@microsoft/signalr": "^3.1.6",
+    "@microsoft/signalr": "^7.0.7",
     "deepmerge": "^4.2.2",
     "websocket": "^1.0.33"
   }
